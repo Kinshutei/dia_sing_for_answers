@@ -1,251 +1,28 @@
-/* ══════════════════════════════════════════
-   Design Token
-   accent : #6b9fd4  （深影スチールブルー）
-   surface: #141414 / #1c1c1c / #242424
-   text   : #e8e8e8 / #a0a0a0 / #606060
-   ══════════════════════════════════════════ */
-
-/* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
-
-/* ── リセット ── */
-*, *::before, *::after { box-sizing: border-box; }
-
-/* ── ベース ── */
-body {
-  margin: 0;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 18px;
-  color: #e8e8e8;
-  background: #0e0e0e;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── スクロールバー ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #141414; }
-::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
-
-/* ── レイアウト ── */
-.app {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 0 0 60px;
-}
-
-/* ── バナー ── */
-.banner {
-  width: 100%;
-  line-height: 0;
-  position: relative;
-}
-.banner::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, #0e0e0e);
-  pointer-events: none;
-}
-.banner img {
-  width: 100%;
-  max-height: 240px;
-  object-fit: cover;
-  display: block;
-}
-
-/* ── タブ ── */
-.tabs {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  padding: 0 16px;
-  border-bottom: 1px solid #242424;
-  background: #0e0e0e;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.tab-btn {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 14px 24px;
-  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #606060;
-  cursor: pointer;
-  margin-bottom: -1px;
-  transition: color 0.2s, border-color 0.2s;
-  white-space: nowrap;
-}
-.tab-btn:hover { color: #a0a0a0; }
-.tab-btn.active {
-  color: #6b9fd4;
-  border-bottom-color: #6b9fd4;
-}
-
-/* タブアイコン
-   アクティブ時は sepia＋hue-rotate で青に。 */
-.tab-icon {
-  height: 22px;
-  width: 22px;
-  object-fit: contain;
-  vertical-align: middle;
-  margin-right: 7px;
-  filter: invert(1) opacity(0.3);
-  transition: filter 0.2s;
-}
-.tab-btn:hover .tab-icon {
-  filter: invert(1) opacity(0.65);
-}
-.tab-btn.active .tab-icon {
-  filter: invert(1) sepia(1) hue-rotate(160deg) saturate(3) brightness(1.1);
-}
-
-/* ── コンテンツエリア ── */
-.content {
-  padding: 24px 20px;
-}
-
-/* ── ボタン ── */
-.btn-secondary {
-  background: #1c1c1c;
-  border: 1px solid #2e2e2e;
-  border-radius: 20px;
-  padding: 4px 14px;
-  font-family: inherit;
-  font-size: 17px;
-  color: #a0a0a0;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  letter-spacing: 0.02em;
-}
-.btn-secondary:hover {
-  background: #242424;
-  color: #6b9fd4;
-  border-color: #3e3e3e;
-}
-
-/* ── Expander ── */
-.expander {
-  border: 1px solid #222;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: border-color 0.15s;
-}
-.expander:hover {
-  border-color: #2e2e2e;
-}
-.expander-header {
-  width: 100%;
-  text-align: left;
-  background: #161616;
-  border: none;
-  padding: 10px 14px;
-  font-family: inherit;
-  font-size: 17px;
-  font-weight: 400;
-  color: #e0e0e0;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  display: flex;
-  align-items: center;
-}
-.expander-header:hover {
-  background: #1e1e1e;
-  color: #ffffff;
-}
-.expander-body {
-  padding: 14px 16px;
-  background: #121212;
-  border-top: 1px solid #1e1e1e;
-}
-
-/* ── セットリストテーブル ── */
-.setlist-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 17px;
-  text-align: left;
-  padding: 5px 10px;
-  border-bottom: 1px solid #2a2a2a;
-  color: #606060;
-  font-weight: 500;
-  white-space: nowrap;
-  letter-spacing: 0.03em;
-}
-.setlist-table td {
-  padding: 5px 10px;
-  border-bottom: 1px solid #1a1a1a;
-  color: #c0c0c0;
-}
-.setlist-table tr:last-child td { border-bottom: none; }
-.setlist-table tr:hover td { background: #1a1a1a; }
-.setlist-table a { color: #6b9fd4; text-decoration: none; }
-.setlist-table a:hover { color: #9bbde0; text-decoration: underline; }
-
-/* ── 曲一覧テーブル ── */
-.songs-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 17px;
-}
-.songs-table th {
-  text-align: center;
-  padding: 8px 10px;
-  border-bottom: 1px solid #2e2e2e;
-  background: #161616;
-  color: #606060;
-  font-weight: 500;
-  white-space: nowrap;
-  letter-spacing: 0.03em;
-  user-select: none;
-}
-.songs-table th:hover {
-  color: #a0a0a0;
-  background: #1c1c1c;
-}
-.songs-table td {
-  padding: 6px 10px;
-  border-bottom: 1px solid #1a1a1a;
-  color: #c0c0c0;
-  white-space: nowrap;
-}
-.songs-table th:nth-child(1), .songs-table td:nth-child(1) { min-width: 224px; }
-.songs-table th:nth-child(2), .songs-table td:nth-child(2) { min-width: 231px; }
-.songs-table th:nth-child(3), .songs-table td:nth-child(3) { min-width: 209px; }
-.songs-table th:nth-child(4), .songs-table td:nth-child(4) { min-width: 155px; }
-.songs-table th:nth-child(5), .songs-table td:nth-child(5) { min-width: 143px; }
-.songs-table th:nth-child(6), .songs-table td:nth-child(6) { min-width: 129px; }
-.songs-table th:nth-child(7), .songs-table td:nth-child(7) { min-width: 112px; }
-.songs-table tr:hover td { background: #181818; }
-
-/* ── 見出し ── */
-h3 {
-  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
-  font-size: 1.0rem;
-  font-weight: 700;
-  color: #606060;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin: 0 0 10px;
-}
-
-/* ── リンク全般 ── */
-a { color: #6b9fd4; }
-a:hover { color: #9bbde0; }
-
-/* ── レスポンシブ ── */
-@media (max-width: 600px) {
-  .expander-body > div {
-    grid-template-columns: 1fr !important;
+{
+  "name": "mikage-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "papaparse": "^5.4.1",
+    "plotly.js-dist-min": "^2.35.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-plotly.js": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/papaparse": "^5.3.14",
+    "@types/plotly.js": "^2.35.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/react-plotly.js": "^2.6.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
   }
-  .tabs { gap: 0; }
-  .tab-btn { font-size: 1.0rem; padding: 12px 14px; }
 }
