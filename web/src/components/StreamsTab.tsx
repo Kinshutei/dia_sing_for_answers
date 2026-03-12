@@ -1,72 +1,203 @@
-import Papa from 'papaparse'
-import { StreamingRecord, SongStat } from '../types'
+import { useState } from 'react'
+import { StreamingRecord } from '../types'
+import { extractYtVideoId } from '../utils/csv'
 
-export function parseCSV(text: string): StreamingRecord[] {
-  const result = Papa.parse<Record<string, string>>(text, {
-    header: true,
-    skipEmptyLines: true,
-  })
-  return result.data.map((row) => ({
-    枠名: row['枠名'] ?? '',
-    楽曲名: row['楽曲名'] ?? '',
-    歌唱順: parseInt(row['歌唱順'] ?? '0', 10) || 0,
-    配信日: normalizeDate(row['配信日'] ?? ''),
-    枠URL: row['枠URL'] ?? '',
-    コラボ相手様: row['コラボ相手様'] ?? 'なし',
-    原曲Artist: row['原曲Artist'] ?? '',
-    作詞: row['作詞'] ?? '',
-    作曲: row['作曲'] ?? '',
-    リリース日: row['リリース日'] ?? '',
-  }))
+interface Props {
+  records: StreamingRecord[]
 }
 
-function normalizeDate(val: string): string {
-  const m = val.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
-  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`
-  return val
-}
+export default function StreamsTab({ records }: Props) {
+  const [defaultOpen, setDefaultOpen] = useState(false)
+  const [mountKey, setMountKey] = useState(0)
+  const [query, setQuery] = useState('')
 
-export function toReleaseYear(val: string): string {
-  if (!val || val === 'nan' || val === 'NaN') return ''
-  const m = val.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
-  const normalized = m
-    ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`
-    : val
-  const d = new Date(normalized)
-  if (isNaN(d.getTime())) return ''
-  return `${d.getFullYear()}年`
-}
-
-export function aggregateSongs(records: StreamingRecord[]): SongStat[] {
-  const map = new Map<string, SongStat>()
-  for (const r of records) {
-    if (!r.楽曲名) continue
-    const existing = map.get(r.楽曲名)
-    if (existing) {
-      existing.歌唱回数++
-      if (!existing.原曲アーティスト && r.原曲Artist) existing.原曲アーティスト = r.原曲Artist
-      if (!existing.作詞 && r.作詞) existing.作詞 = r.作詞
-      if (!existing.作曲 && r.作曲) existing.作曲 = r.作曲
-      if (!existing.リリース日 && r.リリース日) {
-        existing.リリース日 = r.リリース日
-        existing.リリース年 = toReleaseYear(r.リリース日)
-      }
-    } else {
-      map.set(r.楽曲名, {
-        楽曲名: r.楽曲名,
-        原曲アーティスト: r.原曲Artist,
-        作詞: r.作詞,
-        作曲: r.作曲,
-        リリース日: r.リリース日,
-        リリース年: toReleaseYear(r.リリース日),
-        歌唱回数: 1,
-      })
-    }
+  if (records.length === 0) {
+    return <p style={{ color: '#888', padding: '1rem' }}>配信枠がまだ登録されていません。</p>
   }
-  return Array.from(map.values()).sort((a, b) => b.歌唱回数 - a.歌唱回数)
+
+  const trimmedQuery = query.trim()
+  const isSearching = trimmedQuery.length > 0
+
+  const streams = Array.from(
+    new Map(
+      records
+        .sort((a, b) => b.配信日.localeCompare(a.配信日))
+        .map((r) => [`${r.枠名}__${r.配信日}`, { 枠名: r.枠名, 配信日: r.配信日, 枠URL: r.枠URL }])
+    ).values()
+  )
+
+  const filteredStreams = isSearching
+    ? streams.filter((stream) =>
+        records
+          .filter((r) => r.枠名 === stream.枠名)
+          .some((r) => r.楽曲名.toLowerCase().includes(trimmedQuery.toLowerCase()))
+      )
+    : streams
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%', maxWidth: '360px' }}>
+          <span style={{ position: 'absolute', left: '10px', color: '#606060', fontSize: '14px', pointerEvents: 'none' }}>🔍</span>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="曲名で検索..."
+            style={{
+              width: '100%',
+              padding: '7px 36px 7px 32px',
+              border: '1px solid #2e2e2e',
+              borderRadius: '20px',
+              fontFamily: 'inherit',
+              fontSize: '15px',
+              outline: 'none',
+              background: '#1c1c1c',
+              color: '#e8e8e8',
+              boxShadow: isSearching ? '0 0 0 2px rgba(107,159,212,0.25)' : undefined,
+              borderColor: isSearching ? '#6b9fd4' : '#2e2e2e',
+              transition: 'border-color 0.15s, box-shadow 0.15s',
+            }}
+          />
+          {isSearching && (
+            <button
+              onClick={() => setQuery('')}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#aaa',
+                fontSize: '14px',
+                lineHeight: 1,
+                padding: '0',
+              }}
+              title="クリア"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        {isSearching && (
+          <span style={{ fontSize: '13px', color: '#606060' }}>
+            {filteredStreams.length} 件の枠がヒット
+          </span>
+        )}
+        {!isSearching && (
+          <>
+            <button className="btn-secondary" onClick={() => { setDefaultOpen(true); setMountKey((k) => k + 1) }}>▼ 全て開く</button>
+            <button className="btn-secondary" onClick={() => { setDefaultOpen(false); setMountKey((k) => k + 1) }}>▲ 全て閉じる</button>
+          </>
+        )}
+      </div>
+
+      {filteredStreams.length === 0 && isSearching && (
+        <p style={{ color: '#606060', fontSize: '14px' }}>「{trimmedQuery}」を含む枠が見つかりませんでした。</p>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {filteredStreams.map((stream) => {
+          const setlist = records
+            .filter((r) => r.枠名 === stream.枠名)
+            .sort((a, b) => a.歌唱順 - b.歌唱順)
+          const videoId = extractYtVideoId(stream.枠URL)
+          const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null
+          const cleanUrl = videoId ? `https://www.youtube.com/live/${videoId}` : stream.枠URL
+
+          return (
+            <StreamExpander
+              key={`${stream.枠名}_${stream.配信日}_${mountKey}`}
+              label={`${stream.配信日}　${stream.枠名}`}
+              forceOpen={isSearching}
+              defaultOpen={defaultOpen}
+              thumbUrl={thumbUrl}
+              cleanUrl={cleanUrl}
+              setlist={setlist}
+              query={trimmedQuery}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
-export function extractYtVideoId(url: string): string | null {
-  const m = url.match(/(?:v=|live\/)([A-Za-z0-9_-]{11})/)
-  return m ? m[1] : null
+interface ExpanderProps {
+  label: string
+  forceOpen: boolean
+  defaultOpen: boolean
+  thumbUrl: string | null
+  cleanUrl: string
+  setlist: StreamingRecord[]
+  query: string
+}
+
+function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, setlist, query }: ExpanderProps) {
+  const [localOpen, setLocalOpen] = useState(defaultOpen)
+  const isOpen = forceOpen || localOpen
+
+  return (
+    <div className="expander">
+      <button
+        className="expander-header"
+        onClick={() => setLocalOpen((v) => !v)}
+        aria-expanded={isOpen}
+      >
+        <span style={{ marginRight: '8px' }}>{isOpen ? '⚜' : '▶'}</span>
+        <span dangerouslySetInnerHTML={{ __html: label }} />
+      </button>
+
+      <div style={{ maxHeight: isOpen ? '1000px' : '0', overflow: 'hidden', transition: 'max-height 0.35s ease' }}>
+        <div className="expander-body">
+          <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '16px' }}>
+            <div>
+              {thumbUrl ? (
+                <>
+                  <img src={thumbUrl} alt="サムネイル" style={{ width: '100%', borderRadius: '6px' }} />
+                  <a href={cleanUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#6b9fd4', display: 'block', marginTop: '4px' }}>
+                    ▶ YouTubeで開く
+                  </a>
+                </>
+              ) : (
+                <span style={{ fontSize: '13px', color: '#484848' }}>サムネイルなし</span>
+              )}
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table className="setlist-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>楽曲名</th>
+                    <th>コラボ相手様</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {setlist.map((r, i) => {
+                    const isHit = query.length > 0 && r.楽曲名.toLowerCase().includes(query.toLowerCase())
+                    return (
+                      <tr key={i} style={isHit ? { backgroundColor: 'rgba(107,159,212,0.12)' } : undefined}>
+                        <td style={{ textAlign: 'center', color: '#606060' }}>{r.歌唱順}</td>
+                        <td style={isHit ? { fontWeight: 600, color: '#6b9fd4' } : undefined}>{r.楽曲名}</td>
+                        <td style={{ color: '#888888' }}>{r.コラボ相手様 === 'なし' ? '' : r.コラボ相手様}</td>
+                        <td>
+                          {r.枠URL && (
+                            <a href={r.枠URL} target="_blank" rel="noopener noreferrer" style={{ color: '#5a7fa8' }}>
+                              ▶ 開く
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
