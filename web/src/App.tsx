@@ -4,11 +4,12 @@ import { parseCSV } from './utils/csv'
 import StreamsTab from './components/StreamsTab'
 import SongsTab from './components/SongsTab'
 import AboutTab from './components/AboutTab'
+import ChangelogTab from './components/ChangelogTab'
 import './App.css'
 
 const CSV_URL =
   import.meta.env.VITE_CSV_URL ??
-  'https://raw.githubusercontent.com/Kinshutei/Mikage_HishatainoHeya/main/streaming_info.csv'
+  'https://raw.githubusercontent.com/Kinshutei/Mikage_HishatainoHeya/main/streaming_info_mikage.csv'
 
 const BANNER_URL =
   'https://yt3.googleusercontent.com/6REyrT4s7DrjAvRL0yJUJJxi3Ahb59XtcnnDNpu7lC7sojUKthxvBIWJDVSyExFi1BOyJPzZWg' +
@@ -16,7 +17,7 @@ const BANNER_URL =
 
 const MIKAGE_ICON = `${import.meta.env.BASE_URL}icon_mikage.png`
 
-type Tab = 'streams' | 'songs' | 'about'
+type Tab = 'streams' | 'songs' | 'about' | 'changelog'
 
 export default function App() {
   const [records, setRecords] = useState<StreamingRecord[]>([])
@@ -42,10 +43,12 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* バナー */}
       <div className="banner">
         <img src={BANNER_URL} alt="深影 バナー" />
       </div>
 
+      {/* タブ */}
       <div className="tabs">
         <button
           className={`tab-btn ${activeTab === 'streams' ? 'active' : ''}`}
@@ -68,11 +71,21 @@ export default function App() {
           <img src={MIKAGE_ICON} alt="" className="tab-icon" />
           About
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'changelog' ? 'active' : ''}`}
+          onClick={() => setActiveTab('changelog')}
+        >
+          <img src={MIKAGE_ICON} alt="" className="tab-icon" />
+          更新履歴
+        </button>
       </div>
 
+      {/* コンテンツ */}
       <div className="content">
         {activeTab === 'about' ? (
           <AboutTab />
+        ) : activeTab === 'changelog' ? (
+          <ChangelogTab />
         ) : (
           <>
             {loading && <p style={{ color: '#888' }}>読み込み中...</p>}
