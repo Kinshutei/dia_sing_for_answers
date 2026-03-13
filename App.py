@@ -487,11 +487,13 @@ def page_data_management(df: pd.DataFrame):
 
     with col_ex:
         st.subheader("📤 CSVエクスポート")
+        from datetime import date as _date
         csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
+        csv_filename = f"streaming_info_mikage_{_date.today().strftime('%Y%m%d')}.csv"
         st.download_button(
             label="⬇️ CSVダウンロード",
             data=csv_bytes,
-            file_name="streaming_info_mikage.csv",
+            file_name=csv_filename,
             mime="text/csv",
             use_container_width=True,
         )
