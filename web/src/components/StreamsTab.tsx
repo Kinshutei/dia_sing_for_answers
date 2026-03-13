@@ -100,6 +100,7 @@ export default function StreamsTab({ records }: Props) {
         {filteredStreams.map((stream) => {
           const setlist = records
             .filter((r) => r.枠名 === stream.枠名)
+            .filter((r) => !isSearching || r.楽曲名.toLowerCase().includes(trimmedQuery.toLowerCase()))
             .sort((a, b) => a.歌唱順 - b.歌唱順)
           const videoId = extractYtVideoId(stream.枠URL)
           const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null
