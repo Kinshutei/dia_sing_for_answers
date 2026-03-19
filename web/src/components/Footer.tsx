@@ -16,11 +16,12 @@ export default function Footer() {
         alt=""
         style={{
           position: 'absolute',
-          bottom: 54,           // フッターバーの高さ分上
+          bottom: 54,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '100%',
-          maxWidth: 1400,
+          width: '100vw',
+          minWidth: '100%',
+          maxWidth: 'none',
           height: 'auto',
           opacity: 0.45,
           animation: 'sway 5s ease-in-out infinite',
