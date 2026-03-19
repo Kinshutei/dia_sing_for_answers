@@ -249,9 +249,6 @@ a:hover { color: #9bbde0; }
   .tab-btn { font-size: 1.0rem; padding: 12px 14px; }
 }
 
-  50%  { rotate:  2deg; }
-  100% { rotate: -2deg; }
-}
 
 /* ── フッター ── */
 .footer-full  { display: inline; }
