@@ -5,13 +5,14 @@ import { StreamingRecord, SongMaster, SongStat } from '../types'
 // 楽曲マスター
 // ─────────────────────────────────────────
 export function parseSongMaster(text: string): Map<string, SongMaster> {
-  const result = Papa.parse<Record<string, string>>(text, {
+  const cleaned = text.replace(/^﻿/, '')
+  const result = Papa.parse<Record<string, string>>(cleaned, {
     header: true,
     skipEmptyLines: true,
   })
   const map = new Map<string, SongMaster>()
   for (const row of result.data) {
-    const id = row['song_id']?.trim()
+    const id = (row['song_id'] ?? row['﻿song_id'])?.trim()
     if (!id) continue
     map.set(id, {
       song_id: id,
