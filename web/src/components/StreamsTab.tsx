@@ -30,9 +30,18 @@ export default function StreamsTab({ records }: Props) {
     ? streams.filter((stream) =>
         records
           .filter((r) => r.枠名 === stream.枠名)
-          .some((r) => r.楽曲名.toLowerCase().includes(trimmedQuery.toLowerCase()))
+          .some((r) => r.楽曲名.toLowerCase().includes(trimmedQuery.toLowerCase()) || r.原曲Artist.toLowerCase().includes(trimmedQuery.toLowerCase()))
       )
     : streams
+
+  // 楽曲ごとの初回歌唱を特定（配信日昇順で最初のレコード）
+  const firstAppearance = new Map<string, { 枠名: string; 歌唱順: number }>()
+  const sorted = [...records].sort((a, b) => a.配信日.localeCompare(b.配信日) || a.歌唱順 - b.歌唱順)
+  for (const r of sorted) {
+    if (!firstAppearance.has(r.楽曲名)) {
+      firstAppearance.set(r.楽曲名, { 枠名: r.枠名, 歌唱順: r.歌唱順 })
+    }
+  }
 
   // オプション列：コラボ相手様（データが1件以上ある場合のみ表示）
   const hasCollab = records.some((r) => r.コラボ相手様 && r.コラボ相手様 !== 'なし' && r.コラボ相手様 !== '')
@@ -94,7 +103,7 @@ export default function StreamsTab({ records }: Props) {
         {filteredStreams.map((stream) => {
           const setlist = records
             .filter((r) => r.枠名 === stream.枠名)
-            .filter((r) => !isSearching || r.楽曲名.toLowerCase().includes(trimmedQuery.toLowerCase()))
+            .filter((r) => !isSearching || r.楽曲名.toLowerCase().includes(trimmedQuery.toLowerCase()) || r.原曲Artist.toLowerCase().includes(trimmedQuery.toLowerCase()))
             .sort((a, b) => a.歌唱順 - b.歌唱順)
           const videoId = extractYtVideoId(stream.枠URL)
           const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null
@@ -116,6 +125,7 @@ export default function StreamsTab({ records }: Props) {
               setlist={setlist}
               query={trimmedQuery}
               showCollab={frameHasCollab}
+              firstAppearance={firstAppearance}
             />
           )
         })}
@@ -133,9 +143,10 @@ interface ExpanderProps {
   setlist: StreamingRecord[]
   query: string
   showCollab: boolean
+  firstAppearance: Map<string, { 枠名: string; 歌唱順: number }>
 }
 
-function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, setlist, query, showCollab }: ExpanderProps) {
+function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, setlist, query, showCollab, firstAppearance }: ExpanderProps) {
   const [localOpen, setLocalOpen] = useState(defaultOpen)
   const isOpen = forceOpen || localOpen
 
@@ -179,11 +190,26 @@ function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, set
                 </thead>
                 <tbody>
                   {setlist.map((r, i) => {
-                    const isHit = query.length > 0 && r.楽曲名.toLowerCase().includes(query.toLowerCase())
+                    const isHit = query.length > 0 && (r.楽曲名.toLowerCase().includes(query.toLowerCase()) || r.原曲Artist.toLowerCase().includes(query.toLowerCase()))
                     return (
                       <tr key={i} style={isHit ? { backgroundColor: 'rgba(107,159,212,0.12)' } : undefined}>
                         <td>{r.歌唱順}</td>
-                        <td style={isHit ? { fontWeight: 600, color: '#6b9fd4' } : undefined}>{r.楽曲名}</td>
+                        <td style={isHit ? { fontWeight: 600, color: '#6b9fd4' } : undefined}>
+                          {(() => {
+                            const fa = firstAppearance.get(r.楽曲名)
+                            const isFirst = fa?.枠名 === r.枠名 && fa?.歌唱順 === r.歌唱順
+                            return isFirst ? (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                <span style={{
+                                  fontSize: 10, fontWeight: 700, color: '#d4a843',
+                                  border: '1px solid #d4a843', borderRadius: 3,
+                                  padding: '1px 4px', letterSpacing: '0.05em', lineHeight: 1.4,
+                                }}>初</span>
+                                {r.楽曲名}
+                              </span>
+                            ) : r.楽曲名
+                          })()}
+                        </td>
                         <td style={{ color: '#888888' }}>{r.原曲Artist}</td>
                         <td>
                           {r.枠URL && (
