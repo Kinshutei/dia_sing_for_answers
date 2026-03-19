@@ -17,25 +17,26 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
 
 .app {
-  max-width: 1300px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 0 60px;
 }
 
+/* バナー：下・左右フェード */
 .banner {
   width: 100%;
   line-height: 0;
   position: relative;
 }
-.banner::after {
+.banner::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, #0e0e0e);
+  inset: 0;
+  background:
+    linear-gradient(to right,  #0e0e0e 0%, transparent 12%, transparent 88%, #0e0e0e 100%),
+    linear-gradient(to bottom, transparent 60%, #0e0e0e 100%);
   pointer-events: none;
+  z-index: 1;
 }
 .banner img {
   width: 100%;
@@ -148,11 +149,14 @@ body {
   border-top: 1px solid #1e1e1e;
 }
 
+/* セットリスト表 */
 .setlist-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 17px;
   text-align: left;
+}
+.setlist-table th {
   padding: 5px 10px;
   border-bottom: 1px solid #2a2a2a;
   color: #606060;
@@ -160,21 +164,40 @@ body {
   white-space: nowrap;
   letter-spacing: 0.03em;
 }
+.setlist-table th:nth-child(1) { width: 36px; text-align: left; }
+.setlist-table th:nth-child(2) { width: 220px; }
+.setlist-table th:nth-child(3) { width: 180px; }
+.setlist-table th:nth-child(4) { width: 60px; }
 .setlist-table td {
   padding: 5px 10px;
   border-bottom: 1px solid #1a1a1a;
   color: #c0c0c0;
+  white-space: nowrap;
 }
+.setlist-table td:nth-child(1) { color: #484848; text-align: left; width: 36px; }
+.setlist-table td:nth-child(2) { width: 220px; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+.setlist-table td:nth-child(3) { width: 180px; overflow: hidden; text-overflow: ellipsis; max-width: 180px; color: #888; }
+.setlist-table td:nth-child(4) { width: 60px; }
 .setlist-table tr:last-child td { border-bottom: none; }
 .setlist-table tr:hover td { background: #1a1a1a; }
 .setlist-table a { color: #6b9fd4; text-decoration: none; }
 .setlist-table a:hover { color: #9bbde0; text-decoration: underline; }
 
+/* 楽曲一覧表：スクロール対応 */
+.songs-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(25 * 38px + 42px); /* 25行 + ヘッダー */
+  margin-bottom: 32px;
+  border: 1px solid #1e1e1e;
+  border-radius: 6px;
+}
 .songs-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 17px;
 }
+.songs-table thead { position: sticky; top: 0; z-index: 1; }
 .songs-table th {
   text-align: center;
   padding: 8px 10px;
