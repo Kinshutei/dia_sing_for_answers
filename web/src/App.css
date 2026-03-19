@@ -19,7 +19,7 @@ body {
 .app {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 0 60px;
+  padding: 0 0 220px;
 }
 
 /* バナー：下・左右フェード */
@@ -247,4 +247,21 @@ a:hover { color: #9bbde0; }
   }
   .tabs { gap: 0; }
   .tab-btn { font-size: 1.0rem; padding: 12px 14px; }
+}
+
+/* ── 彼岸花 揺れアニメーション ── */
+@keyframes sway {
+  0%   { transform: rotate(var(--ir, -4deg)) translateX(0px); }
+  25%  { transform: rotate(calc(var(--ir, -4deg) + 4deg)) translateX(2px); }
+  75%  { transform: rotate(calc(var(--ir, -4deg) - 4deg)) translateX(-2px); }
+  100% { transform: rotate(var(--ir, -4deg)) translateX(0px); }
+}
+
+/* ── フッター ── */
+.footer-full  { display: inline; }
+.footer-short { display: none; }
+
+@media (max-width: 640px) {
+  .footer-full  { display: none; }
+  .footer-short { display: inline; }
 }
