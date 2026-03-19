@@ -13,7 +13,7 @@ const STREAMING_CSV_URL =
 
 const SONG_MASTER_URL =
   import.meta.env.VITE_MASTER_URL ??
-  'https://raw.githubusercontent.com/Kinshutei/Mikage_HishatainoHeya/main/song_master.csv'
+  'https://raw.githubusercontent.com/Kinshutei/Mikage_HishatainoHeya/main/song_master_Mikage.csv'
 
 const BANNER_URL =
   'https://yt3.googleusercontent.com/6REyrT4s7DrjAvRL0yJUJJxi3Ahb59XtcnnDNpu7lC7sojUKthxvBIWJDVSyExFi1BOyJPzZWg' +
