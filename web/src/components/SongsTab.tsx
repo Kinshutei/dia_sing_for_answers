@@ -91,7 +91,7 @@ export default function SongsTab({ records }: Props) {
 
   return (
     <div>
-      <div style={{ overflowX: 'auto', marginBottom: '32px' }}>
+      <div className="songs-table-wrap">
         <table className="songs-table">
           <thead>
             <tr>
@@ -145,7 +145,7 @@ export default function SongsTab({ records }: Props) {
           font: { family: 'Noto Sans JP', color: '#a0a0a0', size: 12 },
           yaxis: { autorange: 'reversed', showgrid: false, tickfont: { size: 11 }, color: '#a0a0a0' },
           xaxis: { showgrid: true, gridcolor: 'rgba(255,255,255,0.05)', zeroline: false, color: '#606060' },
-          margin: { l: 10, r: 55, t: 16, b: 10 },
+          margin: { l: 160, r: 55, t: 16, b: 10 },
           height: Math.max(380, top20.length * 26),
         }}
         config={{ displayModeBar: false, responsive: true }}
@@ -193,8 +193,8 @@ export default function SongsTab({ records }: Props) {
               parents: artists.map(() => ''),
               values: artists.map(([, v]) => v),
               text: artists.map(([, v]) => `${(v / artistTotal * 100).toFixed(1)}%`),
-              texttemplate: '<b>%{label}</b><br>%{value}曲<br>%{text}',
-              hovertemplate: '<b>%{label}</b><br>%{value}曲 (%{text})<extra></extra>',
+              texttemplate: '<b>%{label}</b><br>%{value}回<br>%{text}',
+              hovertemplate: '<b>%{label}</b><br>%{value}回 (%{text})<extra></extra>',
               marker: { colors: artists.map(([, v]) => v), colorscale: treeColorscale, line: { width: 2, color: '#ffffff' }, pad: { t: 22, l: 4, r: 4, b: 4 } },
             }]}
             layout={{ paper_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Noto Sans JP', color: '#c0c0c0' }, margin: { t: 4, l: 0, r: 0, b: 0 }, height: 420 }}
