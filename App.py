@@ -9,7 +9,14 @@ import re
 # ─────────────────────────────────────────
 # 定数
 # ─────────────────────────────────────────
-CSV_COLUMNS = ["枠名", "song_id", "歌唱順", "配信日", "枠URL", "コラボ相手様"]
+STREAMING_COLUMNS = ["枠名", "song_id", "歌唱順", "配信日", "枠URL", "コラボ相手様"]
+MASTER_COLUMNS    = ["song_id", "楽曲名", "原曲アーティスト", "作詞", "作曲", "リリース日"]
+
+# JOIN後の統合カラム（表示用）
+JOINED_COLUMNS = [
+    "枠名", "song_id", "楽曲名", "歌唱順", "配信日",
+    "枠URL", "コラボ相手様", "原曲アーティスト", "作詞", "作曲", "リリース日",
+]
 
 BANNER_URL = (
     "https://yt3.googleusercontent.com/6REyrT4s7DrjAvRL0yJUJJxi3Ahb59XtcnnDNpu7lC7sojUKthxvBIWJDVSyExFi1BOyJPzZWg"
@@ -33,36 +40,28 @@ def _gh_headers() -> dict:
 def _gh_branch() -> str:
     return st.secrets.get("github_branch", "main")
 
-def load_df() -> pd.DataFrame:
-    empty = pd.DataFrame(columns=CSV_COLUMNS)
-    if not _gh_secrets_ok():
-        try:
-            df = pd.read_csv("streaminginfo_Mikage.csv", encoding="utf-8-sig")
-            return _normalize_df(df)
-        except FileNotFoundError:
-            return empty
+def _gh_master_path() -> str:
+    return st.secrets.get("github_master_path", "song_master.csv")
+
+def _gh_fetch_csv(path: str) -> pd.DataFrame | None:
+    """GitHubから指定パスのCSVを取得してDataFrameで返す。失敗時はNone。"""
     repo   = st.secrets["github_repo"]
-    path   = st.secrets["github_csv_path"]
     branch = _gh_branch()
     url    = f"https://api.github.com/repos/{repo}/contents/{path}?ref={branch}"
     try:
         res = requests.get(url, headers=_gh_headers(), timeout=10)
         if res.status_code == 404:
-            return empty
+            return None
         res.raise_for_status()
         content = base64.b64decode(res.json()["content"])
-        df = pd.read_csv(io.BytesIO(content), encoding="utf-8-sig")
-        return _normalize_df(df)
+        return pd.read_csv(io.BytesIO(content), encoding="utf-8-sig")
     except Exception as e:
-        st.warning(f"GitHubからのデータ読み込みに失敗しました: {e}")
-        return empty
+        st.warning(f"GitHub取得失敗 ({path}): {e}")
+        return None
 
-def push_df(df: pd.DataFrame, commit_msg: str = "Update streaming data") -> tuple[bool, str]:
-    if not _gh_secrets_ok():
-        df.to_csv("streaminginfo_Mikage.csv", index=False, encoding="utf-8-sig")
-        return True, "ローカルファイルに保存しました。"
+def _gh_push_csv(df: pd.DataFrame, path: str, commit_msg: str) -> tuple[bool, str]:
+    """DataFrameをGitHubの指定パスにコミットする。"""
     repo   = st.secrets["github_repo"]
-    path   = st.secrets["github_csv_path"]
     branch = _gh_branch()
     url    = f"https://api.github.com/repos/{repo}/contents/{path}"
     try:
@@ -82,16 +81,66 @@ def push_df(df: pd.DataFrame, commit_msg: str = "Update streaming data") -> tupl
     except Exception as e:
         return False, f"GitHubへのコミットに失敗しました: {e}"
 
-def _normalize_df(df: pd.DataFrame) -> pd.DataFrame:
-    for col in CSV_COLUMNS:
+# ─────────────────────────────────────────
+# 楽曲マスター読み書き
+# ─────────────────────────────────────────
+def load_master_df() -> pd.DataFrame:
+    empty = pd.DataFrame(columns=MASTER_COLUMNS)
+    if not _gh_secrets_ok():
+        try:
+            df = pd.read_csv("song_master.csv", encoding="utf-8-sig")
+            return _normalize_master(df)
+        except FileNotFoundError:
+            return empty
+    raw = _gh_fetch_csv(_gh_master_path())
+    return _normalize_master(raw) if raw is not None else empty
+
+def push_master_df(df: pd.DataFrame, commit_msg: str = "Update song master") -> tuple[bool, str]:
+    if not _gh_secrets_ok():
+        df.to_csv("song_master.csv", index=False, encoding="utf-8-sig")
+        return True, "ローカルファイルに保存しました。"
+    return _gh_push_csv(df, _gh_master_path(), commit_msg)
+
+def _normalize_master(df: pd.DataFrame) -> pd.DataFrame:
+    for col in MASTER_COLUMNS:
         if col not in df.columns:
             df[col] = ""
-    df = df[CSV_COLUMNS].copy()
-    df["歌唱順"] = pd.to_numeric(df["歌唱順"], errors="coerce").fillna(0).astype(int)
-    df["配信日"] = df["配信日"].apply(_parse_date)
+    df = df[MASTER_COLUMNS].copy()
+    for col in ["楽曲名", "原曲アーティスト", "作詞", "作曲", "リリース日"]:
+        df[col] = df[col].fillna("").astype(str).str.strip()
+    df["song_id"] = df["song_id"].fillna("").astype(str).str.strip()
+    return df
+
+# ─────────────────────────────────────────
+# 配信情報読み書き
+# ─────────────────────────────────────────
+def load_streaming_df() -> pd.DataFrame:
+    empty = pd.DataFrame(columns=STREAMING_COLUMNS)
+    if not _gh_secrets_ok():
+        try:
+            df = pd.read_csv("streaminginfo_Mikage.csv", encoding="utf-8-sig")
+            return _normalize_streaming(df)
+        except FileNotFoundError:
+            return empty
+    raw = _gh_fetch_csv(st.secrets["github_csv_path"])
+    return _normalize_streaming(raw) if raw is not None else empty
+
+def push_streaming_df(df: pd.DataFrame, commit_msg: str = "Update streaming data") -> tuple[bool, str]:
+    if not _gh_secrets_ok():
+        df.to_csv("streaminginfo_Mikage.csv", index=False, encoding="utf-8-sig")
+        return True, "ローカルファイルに保存しました。"
+    return _gh_push_csv(df, st.secrets["github_csv_path"], commit_msg)
+
+def _normalize_streaming(df: pd.DataFrame) -> pd.DataFrame:
+    for col in STREAMING_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    df = df[STREAMING_COLUMNS].copy()
+    df["歌唱順"]   = pd.to_numeric(df["歌唱順"], errors="coerce").fillna(0).astype(int)
+    df["配信日"]   = df["配信日"].apply(_parse_date)
     df["コラボ相手様"] = df["コラボ相手様"].fillna("なし").astype(str)
-    df["枠URL"] = df["枠URL"].fillna("").astype(str)
-    df["song_id"] = df["song_id"].fillna("").astype(str)
+    df["枠URL"]    = df["枠URL"].fillna("").astype(str)
+    df["song_id"]  = df["song_id"].fillna("").astype(str).str.strip()
     return df
 
 def _parse_date(val) -> str:
@@ -105,7 +154,24 @@ def _parse_date(val) -> str:
         return s
 
 # ─────────────────────────────────────────
-# Excel → CSV 変換
+# JOIN: 配信情報 ＋ 楽曲マスター
+# ─────────────────────────────────────────
+def join_df(streaming: pd.DataFrame, master: pd.DataFrame) -> pd.DataFrame:
+    """streaming_info に song_master を song_id でJOINして統合DataFrameを返す。"""
+    if master.empty:
+        # マスターがない場合はフォールバック（楽曲名なしで表示）
+        for col in ["楽曲名", "原曲アーティスト", "作詞", "作曲", "リリース日"]:
+            streaming[col] = ""
+        return streaming[JOINED_COLUMNS]
+    merged = streaming.merge(master, on="song_id", how="left")
+    for col in ["楽曲名", "原曲アーティスト", "作詞", "作曲", "リリース日"]:
+        if col not in merged.columns:
+            merged[col] = ""
+        merged[col] = merged[col].fillna("").astype(str)
+    return merged[JOINED_COLUMNS]
+
+# ─────────────────────────────────────────
+# Excel → streaming_info 変換
 # ─────────────────────────────────────────
 def _format_release_date(val) -> str:
     if val is None:
@@ -128,11 +194,11 @@ def _format_release_date(val) -> str:
     except Exception:
         return s
 
-def convert_excel_to_df(raw: bytes) -> tuple:
+def convert_excel_to_streaming(raw: bytes, master: pd.DataFrame) -> tuple:
     """
-    Excelファイルを読み込み、深影のデータだけをCSV形式のDataFrameに変換する。
+    Excelファイルを読み込み、配信情報CSVのDataFrameに変換する。
     - performancesシート：VTuber == '深影' のみ対象
-    - songsシートと曲名でJOINして作詞・作曲・リリース日を補完
+    - songsシートの曲名と song_master を突合して song_id を自動付与
     - 枠URLはタイムスタンプ列からVideo IDを抽出してクリーンなURLを生成
     - 歌唱順は同一枠内の行順から自動採番
     """
@@ -152,25 +218,15 @@ def convert_excel_to_df(raw: bytes) -> tuple:
     if missing:
         return None, f"performancesシートに必要な列がありません: {missing}"
 
-    # 深影のみ抽出
     perf = perf[perf["VTuber"] == "深影"].copy()
     if perf.empty:
         return None, "深影のデータが見つかりませんでした。"
 
-    # songsシートをJOIN
-    song_map = {}
-    if "songs" in xls.sheet_names:
-        songs = xls.parse("songs")
-        songs.columns = [str(c).strip() for c in songs.columns]
-        for _, row in songs.iterrows():
-            title = str(row.get("タイトル", "")).strip()
-            if not title:
-                continue
-            song_map[title] = {
-                "作詞": "" if pd.isna(row.get("作詞", "")) else str(row.get("作詞", "")).strip(),
-                "作曲": "" if pd.isna(row.get("作曲", "")) else str(row.get("作曲", "")).strip(),
-                "リリース日": _format_release_date(row.get("リリース日", "")),
-            }
+    # 楽曲マスターの song_id マップ（楽曲名 → song_id）
+    title_to_id = {}
+    if not master.empty:
+        for _, row in master.iterrows():
+            title_to_id[str(row["楽曲名"]).strip()] = str(row["song_id"]).strip()
 
     # 枠ごとのVideo IDを収集
     ts_col = "タイムスタンプ" if "タイムスタンプ" in perf.columns else None
@@ -185,13 +241,13 @@ def convert_excel_to_df(raw: bytes) -> tuple:
                 frame_key = str(row["歌枠タイトル"]).strip()
                 frame_video_id[frame_key] = m.group(1)
 
-    # 配信日の正規化
     perf["_date_str"] = perf["日付"].apply(
         lambda v: pd.to_datetime(v).strftime("%Y-%m-%d") if not pd.isna(v) else ""
     )
     perf["_frame_key"] = perf["歌枠タイトル"].astype(str).str.strip()
 
     rows = []
+    unmatched = []
     for frame_key, group in perf.groupby("_frame_key", sort=False):
         group = group.reset_index(drop=True)
         date_str  = group.iloc[0]["_date_str"]
@@ -200,23 +256,27 @@ def convert_excel_to_df(raw: bytes) -> tuple:
 
         for idx, row in group.iterrows():
             song_title = str(row.get("曲名", "")).strip()
-            artist     = "" if pd.isna(row.get("アーティスト", "")) else str(row.get("アーティスト", "")).strip()
-            song_info  = song_map.get(song_title, {})
-
+            sid = title_to_id.get(song_title, "")
+            if not sid:
+                unmatched.append(song_title)
             rows.append({
-                "枠名":       frame_key,
-                "song_id":    "",  # Excelインポート後は song_master と突合して手動設定
-                "歌唱順":     idx + 1,
-                "配信日":     date_str,
-                "枠URL":      frame_url,
+                "枠名":        frame_key,
+                "song_id":     sid,
+                "歌唱順":      idx + 1,
+                "配信日":      date_str,
+                "枠URL":       frame_url,
                 "コラボ相手様": "なし",
             })
 
     if not rows:
         return None, "変換後のデータが空になりました。"
 
-    result_df = pd.DataFrame(rows, columns=CSV_COLUMNS)
-    return result_df, ""
+    result_df = pd.DataFrame(rows, columns=STREAMING_COLUMNS)
+    warn_msg = ""
+    if unmatched:
+        uniq = list(dict.fromkeys(unmatched))[:10]
+        warn_msg = f"song_master に未登録の曲が {len(unmatched)} 件あります（先頭10件）: {uniq}"
+    return result_df, warn_msg
 
 # ─────────────────────────────────────────
 # 認証ヘルパー
@@ -332,7 +392,7 @@ def page_songs(df: pd.DataFrame):
     count_df = (
         df.groupby("楽曲名", as_index=False)
         .agg(
-            原曲アーティスト=("原曲Artist", lambda x: next((v for v in x if v), "")),
+            原曲アーティスト=("原曲アーティスト", lambda x: next((v for v in x if v), "")),
             作詞=("作詞", lambda x: next((v for v in x if v), "")),
             作曲=("作曲", lambda x: next((v for v in x if v), "")),
             リリース日=("リリース日", lambda x: next((v for v in x if v), "")),
@@ -435,105 +495,181 @@ def page_songs(df: pd.DataFrame):
 # ─────────────────────────────────────────
 # ページ：データ管理（認証必須）
 # ─────────────────────────────────────────
-def page_data_management(df: pd.DataFrame):
+def page_data_management(streaming: pd.DataFrame, master: pd.DataFrame):
     if not check_password():
         return
 
     logout_button()
 
-    # ── Excelインポート ──
-    st.subheader("📊 Excelから一括インポート（深影データ自動変換）")
-    st.info(
-        "performancesシートの深影データを自動変換します。"
-        "songsシートと曲名でJOINして作詞・作曲・リリース日を補完します。"
-        "枠URLはタイムスタンプ列のVideo IDから自動生成します（なければ空欄）。",
-        icon="ℹ️",
-    )
-    st.warning("⚠️ 実行すると既存データは全て置き換えられます。", icon="⚠️")
+    mgmt_tab1, mgmt_tab2 = st.tabs(["楽曲マスター管理", "配信情報管理"])
 
-    uploaded_xlsx = st.file_uploader("Excelファイルを選択（.xlsx）", type=["xlsx"], key="import_xlsx")
+    # ── タブ1：楽曲マスター ──
+    with mgmt_tab1:
+        st.subheader("📋 楽曲マスター（song_master.csv）")
+        st.caption(f"{len(master)} 曲登録済み")
+        if not master.empty:
+            st.dataframe(
+                master,
+                use_container_width=True,
+                hide_index=True,
+                column_config={"song_id": None},
+            )
 
-    if uploaded_xlsx:
-        raw = uploaded_xlsx.read()
-        preview_df, err = convert_excel_to_df(raw)
-
-        if err:
-            st.error(err)
-        elif preview_df is not None:
-            st.success(f"変換成功：{len(preview_df)} 件（{preview_df['枠名'].nunique()} 枠）")
-            with st.expander("変換結果プレビュー（先頭30行）", expanded=False):
-                st.dataframe(preview_df.head(30), use_container_width=True, hide_index=True)
-
-            if st.button("🚀 このデータでGitHubにコミット", type="primary", use_container_width=True):
-                ok, msg = push_df(preview_df, commit_msg="Update: Excel import (深影)")
-                if ok:
-                    st.success(f"{len(preview_df)} 件をGitHubにコミットしました。")
-                    st.cache_data.clear()
-                    st.rerun()
-                else:
-                    st.error(msg)
-
-    st.divider()
-
-    # ── CSVエクスポート / インポート ──
-    col_ex, col_im = st.columns(2)
-
-    with col_ex:
-        st.subheader("📤 CSVエクスポート")
-        from datetime import date as _date
-        csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
-        csv_filename = f"streaminginfo_Mikage_{_date.today().strftime('%Y%m%d')}.csv"
-        st.download_button(
-            label="⬇️ CSVダウンロード",
-            data=csv_bytes,
-            file_name=csv_filename,
-            mime="text/csv",
-            use_container_width=True,
-        )
-
-    with col_im:
-        st.subheader("📥 CSVインポート（完全上書き）")
-        st.warning("⚠️ インポートすると既存データは全て置き換えられます。", icon="⚠️")
-        uploaded_csv = st.file_uploader("CSVファイルを選択（UTF-8 / Shift-JIS）", type=["csv"], key="import_csv")
-        if uploaded_csv:
-            if st.button("🔁 CSVインポート実行", use_container_width=True, type="primary"):
-                raw_csv = uploaded_csv.read()
-                new_df = None
-                for enc in ("utf-8-sig", "cp932", "utf-8"):
-                    try:
-                        new_df = pd.read_csv(io.BytesIO(raw_csv), encoding=enc)
-                        break
-                    except Exception:
-                        continue
-                if new_df is None:
-                    st.error("文字コードを判別できませんでした。")
-                else:
-                    missing = [c for c in ["枠名", "楽曲名", "歌唱順", "配信日"] if c not in new_df.columns]
-                    if missing:
-                        st.error(f"必要な列が不足しています: {missing}")
+        col_ex, col_im = st.columns(2)
+        with col_ex:
+            st.subheader("📤 マスターCSVエクスポート")
+            from datetime import date as _date
+            master_bytes = master.to_csv(index=False).encode("utf-8-sig")
+            st.download_button(
+                label="⬇️ song_master.csv ダウンロード",
+                data=master_bytes,
+                file_name="song_master.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+        with col_im:
+            st.subheader("📥 マスターCSVインポート（完全上書き）")
+            st.warning("⚠️ インポートすると既存マスターは全て置き換えられます。", icon="⚠️")
+            uploaded_master = st.file_uploader(
+                "song_master.csv を選択", type=["csv"], key="import_master"
+            )
+            if uploaded_master:
+                if st.button("🔁 マスターインポート実行", use_container_width=True, type="primary"):
+                    raw_csv = uploaded_master.read()
+                    new_master = None
+                    for enc in ("utf-8-sig", "cp932", "utf-8"):
+                        try:
+                            new_master = pd.read_csv(io.BytesIO(raw_csv), encoding=enc)
+                            break
+                        except Exception:
+                            continue
+                    if new_master is None:
+                        st.error("文字コードを判別できませんでした。")
                     else:
-                        new_df = _normalize_df(new_df)
-                        ok, msg = push_df(new_df, commit_msg="Update: CSV import via app")
-                        if ok:
-                            st.success(f"{len(new_df)} 件をGitHubにコミットしました。")
-                            st.cache_data.clear()
-                            st.rerun()
+                        missing = [c for c in ["song_id", "楽曲名"] if c not in new_master.columns]
+                        if missing:
+                            st.error(f"必要な列が不足しています: {missing}")
                         else:
-                            st.error(msg)
+                            new_master = _normalize_master(new_master)
+                            ok, msg = push_master_df(new_master, "Update: song_master import via app")
+                            if ok:
+                                st.success(f"{len(new_master)} 件をGitHubにコミットしました。")
+                                st.cache_data.clear()
+                                st.rerun()
+                            else:
+                                st.error(msg)
 
-    st.divider()
-    st.subheader("📋 現在のデータ")
-    if df.empty:
-        st.info("データがまだありません。")
-    else:
-        st.dataframe(df, use_container_width=True, hide_index=True)
+    # ── タブ2：配信情報 ──
+    with mgmt_tab2:
+        # Excelインポート
+        st.subheader("📊 Excelから一括インポート（深影データ自動変換）")
+        st.info(
+            "performancesシートの深影データを自動変換します。"
+            "song_master の楽曲名で song_id を自動付与します。"
+            "マスター未登録の曲は song_id が空になります（後から手動設定）。",
+            icon="ℹ️",
+        )
+        st.warning("⚠️ 実行すると配信情報CSVは全て置き換えられます。", icon="⚠️")
+
+        uploaded_xlsx = st.file_uploader("Excelファイルを選択（.xlsx）", type=["xlsx"], key="import_xlsx")
+        if uploaded_xlsx:
+            raw = uploaded_xlsx.read()
+            preview_df, warn_msg = convert_excel_to_streaming(raw, master)
+
+            if preview_df is None:
+                st.error(warn_msg)
+            else:
+                st.success(f"変換成功：{len(preview_df)} 件（{preview_df['枠名'].nunique()} 枠）")
+                if warn_msg:
+                    st.warning(warn_msg)
+                with st.expander("変換結果プレビュー（先頭30行）", expanded=False):
+                    st.dataframe(
+                        preview_df.head(30),
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config={"song_id": None},
+                    )
+
+                if st.button("🚀 このデータでGitHubにコミット", type="primary", use_container_width=True):
+                    ok, msg = push_streaming_df(preview_df, commit_msg="Update: Excel import (深影)")
+                    if ok:
+                        st.success(f"{len(preview_df)} 件をGitHubにコミットしました。")
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        st.error(msg)
+
+        st.divider()
+
+        # CSVエクスポート / インポート
+        col_ex, col_im = st.columns(2)
+        with col_ex:
+            st.subheader("📤 配信情報CSVエクスポート")
+            from datetime import date as _date
+            csv_bytes = streaming.to_csv(index=False).encode("utf-8-sig")
+            csv_filename = f"streaminginfo_Mikage_{_date.today().strftime('%Y%m%d')}.csv"
+            st.download_button(
+                label="⬇️ CSVダウンロード",
+                data=csv_bytes,
+                file_name=csv_filename,
+                mime="text/csv",
+                use_container_width=True,
+            )
+
+        with col_im:
+            st.subheader("📥 配信情報CSVインポート（完全上書き）")
+            st.warning("⚠️ インポートすると既存データは全て置き換えられます。", icon="⚠️")
+            uploaded_csv = st.file_uploader(
+                "streaminginfo_Mikage_yyyymmdd.csv を選択", type=["csv"], key="import_csv"
+            )
+            if uploaded_csv:
+                if st.button("🔁 CSVインポート実行", use_container_width=True, type="primary"):
+                    raw_csv = uploaded_csv.read()
+                    new_df = None
+                    for enc in ("utf-8-sig", "cp932", "utf-8"):
+                        try:
+                            new_df = pd.read_csv(io.BytesIO(raw_csv), encoding=enc)
+                            break
+                        except Exception:
+                            continue
+                    if new_df is None:
+                        st.error("文字コードを判別できませんでした。")
+                    else:
+                        missing = [c for c in ["枠名", "song_id", "歌唱順", "配信日"] if c not in new_df.columns]
+                        if missing:
+                            st.error(f"必要な列が不足しています: {missing}")
+                        else:
+                            new_df = _normalize_streaming(new_df)
+                            ok, msg = push_streaming_df(new_df, commit_msg="Update: CSV import via app")
+                            if ok:
+                                st.success(f"{len(new_df)} 件をGitHubにコミットしました。")
+                                st.cache_data.clear()
+                                st.rerun()
+                            else:
+                                st.error(msg)
+
+        st.divider()
+        st.subheader("📋 現在の配信情報（生データ）")
+        if streaming.empty:
+            st.info("データがまだありません。")
+        else:
+            st.dataframe(
+                streaming,
+                use_container_width=True,
+                hide_index=True,
+                column_config={"song_id": None},
+            )
 
 # ─────────────────────────────────────────
 # データ読み込み（キャッシュ付き）
 # ─────────────────────────────────────────
 @st.cache_data(ttl=60)
-def get_data() -> pd.DataFrame:
-    return load_df()
+def get_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """(joined_df, streaming_df, master_df) を返す"""
+    master   = load_master_df()
+    streaming = load_streaming_df()
+    joined   = join_df(streaming.copy(), master)
+    return joined, streaming, master
 
 # ─────────────────────────────────────────
 # メイン
@@ -586,8 +722,15 @@ def main():
         unsafe_allow_html=True,
     )
 
-    df = get_data()
-    page_data_management(df)
+    joined, streaming, master = get_data()
+
+    tab1, tab2, tab3 = st.tabs(["LiveStreaming Info", "Uta-Mita DB", "データ管理"])
+    with tab1:
+        page_streams(joined)
+    with tab2:
+        page_songs(joined)
+    with tab3:
+        page_data_management(streaming, master)
 
 
 if __name__ == "__main__":
