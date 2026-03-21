@@ -5,10 +5,10 @@ export default function AboutTab() {
       <section style={{ marginBottom: 40 }}>
         <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>このサイトについて</h3>
         <p>
-          このサイトはRK Music所属のVSinger <strong style={{ color: '#6b9fd4' }}>深影（Mikage）</strong>さんの歌ってみた・配信情報をまとめたファンメイドのデータベースサイトです。
+          このサイトはRK Music所属のVSinger <strong style={{ color: '#6b9fd4' }}>Diα（ディア）</strong>さんの歌ってみた・配信情報をまとめたファンメイドのデータベースサイトです。
         </p>
         <p>
-          公式サイトではありませんので、掲載情報には誤りを含む場合がございます。RK Music及び深影さんへの直接のお問い合わせはなさらないようお願いいたします。ご質問等については、<a href="https://x.com/WL_GE_inn" target="_blank" rel="noopener noreferrer">白百合と金鷲亭(@WL_GE_inn)</a>までお問い合わせください。
+          公式サイトではありませんので、掲載情報には誤りを含む場合がございます。RK Music及びDiαさんへの直接のお問い合わせはなさらないようお願いいたします。ご質問等については、<a href="https://x.com/WL_GE_inn" target="_blank" rel="noopener noreferrer">白百合と金鷲亭(@WL_GE_inn)</a>までお問い合わせください。
         </p>
         <p style={{ color: '#666', fontSize: '0.9rem' }}>
           ※ 掲載情報は有志（若干1名）が手動で更新しています。
@@ -18,7 +18,7 @@ export default function AboutTab() {
       <section style={{ marginBottom: 40 }}>
         <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>本サイトの構築目的</h3>
         <p>
-          本サイトは個人が運営する情報発信サイトです。深影さんの活動をより多くの方に知っていただくこと、そして深影さんのモチベーション向上に少しでも貢献できればとの想いから開設しました。
+          本サイトは個人が運営する情報発信サイトです。Diαさんの活動をより多くの方に知っていただくこと、そしてDiαさんのモチベーション向上に少しでも貢献できればとの想いから開設しました。
         </p>
       </section>
 
@@ -51,7 +51,7 @@ export default function AboutTab() {
             {[
               ['データ形式', 'CSV（GitHubリポジトリで管理）'],
               ['更新タイミング', '歌枠終了後に手動更新'],
-              ['収録範囲', '深影の歌枠・歌ってみた動画'],
+              ['収録範囲', 'Diαの歌枠・歌ってみた動画'],
               ['コラボ枠', 'コラボ相手様の名前も記録しています'],
             ].map(([k, v]) => (
               <tr key={k}>
@@ -66,11 +66,11 @@ export default function AboutTab() {
       <section style={{ marginBottom: 40 }}>
         <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>リンク</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a href="https://www.youtube.com/@Mikage_RKMusic" target="_blank" rel="noopener noreferrer" style={{ color: '#6b9fd4', fontSize: '0.95rem' }}>
-            ▶ 深影 YouTube チャンネル
+          <a href="https://www.youtube.com/channel/UC80TduEq6Sp4n2DkiUH2eLQ" target="_blank" rel="noopener noreferrer" style={{ color: '#6b9fd4', fontSize: '0.95rem' }}>
+            ▶ Diα YouTube チャンネル
           </a>
-          <a href="https://twitter.com/Mikage_0916" target="_blank" rel="noopener noreferrer" style={{ color: '#6b9fd4', fontSize: '0.95rem' }}>
-            𝕏 深影 X（Twitter）
+          <a href="https://x.com/fused_dia" target="_blank" rel="noopener noreferrer" style={{ color: '#6b9fd4', fontSize: '0.95rem' }}>
+            𝕏 Diα X（Twitter）
           </a>
         </div>
       </section>
@@ -78,7 +78,7 @@ export default function AboutTab() {
       <section>
         <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>免責事項</h3>
         <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.8 }}>
-          本サイトは個人が運営するものであり、RK Music様および深影様とは無関係です。掲載情報の正確性は確保するよう努めておりますが、誤りを含む場合がございます。RK Music様および深影様より情報の削除を要請された場合は、速やかに対応いたします。
+          本サイトは個人が運営するものであり、RK Music様およびDiα様とは無関係です。掲載情報の正確性は確保するよう努めておりますが、誤りを含む場合がございます。RK Music様およびDiα様より情報の削除を要請された場合は、速やかに対応いたします。
         </p>
       </section>
 

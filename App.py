@@ -19,7 +19,7 @@ JOINED_COLUMNS = [
 ]
 
 BANNER_URL = (
-    "https://yt3.googleusercontent.com/6REyrT4s7DrjAvRL0yJUJJxi3Ahb59XtcnnDNpu7lC7sojUKthxvBIWJDVSyExFi1BOyJPzZWg"
+    "https://yt3.googleusercontent.com/U6LeCOlVJ4m68-o30FpSEjVuwFxmPYYzDD3je0Sy_SuSYesAmoUvIkSyP81M2l73qOIcpNP7"
     "=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
 )
 ACCENT = "#6b9fd4"
@@ -118,7 +118,7 @@ def load_streaming_df() -> pd.DataFrame:
     empty = pd.DataFrame(columns=STREAMING_COLUMNS)
     if not _gh_secrets_ok():
         try:
-            df = pd.read_csv("streaminginfo_Mikage.csv", encoding="utf-8-sig")
+            df = pd.read_csv("streaminginfo_Dia.csv", encoding="utf-8-sig")
             return _normalize_streaming(df)
         except FileNotFoundError:
             return empty
@@ -127,7 +127,7 @@ def load_streaming_df() -> pd.DataFrame:
 
 def push_streaming_df(df: pd.DataFrame, commit_msg: str = "Update streaming data") -> tuple[bool, str]:
     if not _gh_secrets_ok():
-        df.to_csv("streaminginfo_Mikage.csv", index=False, encoding="utf-8-sig")
+        df.to_csv("streaminginfo_Dia.csv", index=False, encoding="utf-8-sig")
         return True, "ローカルファイルに保存しました。"
     return _gh_push_csv(df, st.secrets["github_csv_path"], commit_msg)
 
@@ -197,7 +197,7 @@ def _format_release_date(val) -> str:
 def convert_excel_to_streaming(raw: bytes, master: pd.DataFrame) -> tuple:
     """
     Excelファイルを読み込み、配信情報CSVのDataFrameに変換する。
-    - performancesシート：VTuber == '深影' のみ対象
+    - performancesシート：VTuber == 'Diα' のみ対象
     - songsシートの曲名と song_master を突合して song_id を自動付与
     - 枠URLはタイムスタンプ列からVideo IDを抽出してクリーンなURLを生成
     - 歌唱順は同一枠内の行順から自動採番
@@ -218,9 +218,9 @@ def convert_excel_to_streaming(raw: bytes, master: pd.DataFrame) -> tuple:
     if missing:
         return None, f"performancesシートに必要な列がありません: {missing}"
 
-    perf = perf[perf["VTuber"] == "深影"].copy()
+    perf = perf[perf["VTuber"] == "Diα"].copy()
     if perf.empty:
-        return None, "深影のデータが見つかりませんでした。"
+        return None, "Diαのデータが見つかりませんでした。"
 
     # 楽曲マスターの song_id マップ（楽曲名 → song_id）
     title_to_id = {}
@@ -564,9 +564,9 @@ def page_data_management(streaming: pd.DataFrame, master: pd.DataFrame):
     # ── タブ2：配信情報 ──
     with mgmt_tab2:
         # Excelインポート
-        st.subheader("📊 Excelから一括インポート（深影データ自動変換）")
+        st.subheader("📊 Excelから一括インポート（Diαデータ自動変換）")
         st.info(
-            "performancesシートの深影データを自動変換します。"
+            "performancesシートのDiαデータを自動変換します。"
             "song_master の楽曲名で song_id を自動付与します。"
             "マスター未登録の曲は song_id が空になります（後から手動設定）。",
             icon="ℹ️",
@@ -593,7 +593,7 @@ def page_data_management(streaming: pd.DataFrame, master: pd.DataFrame):
                     )
 
                 if st.button("🚀 このデータでGitHubにコミット", type="primary", use_container_width=True):
-                    ok, msg = push_streaming_df(preview_df, commit_msg="Update: Excel import (深影)")
+                    ok, msg = push_streaming_df(preview_df, commit_msg="Update: Excel import (Diα)")
                     if ok:
                         st.success(f"{len(preview_df)} 件をGitHubにコミットしました。")
                         st.cache_data.clear()
@@ -609,7 +609,7 @@ def page_data_management(streaming: pd.DataFrame, master: pd.DataFrame):
             st.subheader("📤 配信情報CSVエクスポート")
             from datetime import date as _date
             csv_bytes = streaming.to_csv(index=False).encode("utf-8-sig")
-            csv_filename = f"streaminginfo_Mikage_{_date.today().strftime('%Y%m%d')}.csv"
+            csv_filename = f"streaminginfo_Dia_{_date.today().strftime('%Y%m%d')}.csv"
             st.download_button(
                 label="⬇️ CSVダウンロード",
                 data=csv_bytes,
@@ -622,7 +622,7 @@ def page_data_management(streaming: pd.DataFrame, master: pd.DataFrame):
             st.subheader("📥 配信情報CSVインポート（完全上書き）")
             st.warning("⚠️ インポートすると既存データは全て置き換えられます。", icon="⚠️")
             uploaded_csv = st.file_uploader(
-                "streaminginfo_Mikage_yyyymmdd.csv を選択", type=["csv"], key="import_csv"
+                "streaminginfo_Dia_yyyymmdd.csv を選択", type=["csv"], key="import_csv"
             )
             if uploaded_csv:
                 if st.button("🔁 CSVインポート実行", use_container_width=True, type="primary"):
@@ -678,7 +678,7 @@ def get_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 # ─────────────────────────────────────────
 def main():
     st.set_page_config(
-        page_title="深影 歌ってみたDB",
+        page_title="Diα 歌ってみたDB",
         page_icon="🎵",
         layout="wide",
     )

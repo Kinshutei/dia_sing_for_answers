@@ -24,7 +24,7 @@ export default function Footer() {
           style={{ color: 'rgb(136, 136, 136)', textDecoration: 'none' }}>
           金鷲亭
         </a>
-        　|　非公式ファンサイト — 深影（Mikage / RK Music）　|　掲載情報の誤りは{' '}
+        　|　非公式ファンサイト — Diα（RK Music）　|　掲載情報の誤りは{' '}
         <a href="https://x.com/WL_GE_inn" target="_blank" rel="noopener noreferrer"
           style={{ color: 'rgb(136, 136, 136)', textDecoration: 'none' }}>
           @WL_GE_inn
@@ -32,7 +32,7 @@ export default function Footer() {
         までお気軽にどうぞ
       </span>
       <span className="footer-short">
-        © 2026 金鷲亭　|　深影（Mikage / RK Music）非公式ファンサイト
+        © 2026 金鷲亭　|　Diα（RK Music）非公式ファンサイト
       </span>
     </footer>
   )

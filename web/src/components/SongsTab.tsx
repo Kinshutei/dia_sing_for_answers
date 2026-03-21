@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 
-const MIKAGE_ICON = `${import.meta.env.BASE_URL}icon_mikage.png`
 import Plot from 'react-plotly.js'
 import { StreamingRecord, SongStat } from '../types'
 import { aggregateSongs } from '../utils/csv'
@@ -123,7 +122,7 @@ export default function SongsTab({ records }: Props) {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
         <h3 style={{ color: '#555', margin: 0 }}>歌唱回数ランキング（上位20曲）</h3>
-        <button className="btn-secondary" onClick={() => setBarKey((k) => k + 1)}><img src={MIKAGE_ICON} alt="" style={{ height: 16, width: 16, objectFit: "contain", verticalAlign: "middle", marginRight: 5, filter: "invert(1) opacity(0.5)" }} />リセット</button>
+        <button className="btn-secondary" onClick={() => setBarKey((k) => k + 1)}>リセット</button>
       </div>
       <Plot
         key={barKey}
@@ -156,7 +155,7 @@ export default function SongsTab({ records }: Props) {
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '24px 0 8px' }}>
             <h3 style={{ color: '#555', margin: 0 }}>リリース年度分布</h3>
-            <button className="btn-secondary" onClick={() => setTreeKey((k) => k + 1)}><img src={MIKAGE_ICON} alt="" style={{ height: 16, width: 16, objectFit: "contain", verticalAlign: "middle", marginRight: 5, filter: "invert(1) opacity(0.5)" }} />リセット</button>
+            <button className="btn-secondary" onClick={() => setTreeKey((k) => k + 1)}>リセット</button>
           </div>
           <Plot
             key={treeKey}
@@ -195,7 +194,7 @@ export default function SongsTab({ records }: Props) {
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '24px 0 8px' }}>
             <h3 style={{ color: '#555', margin: 0 }}>原曲アーティスト分布</h3>
-            <button className="btn-secondary" onClick={() => setTreeKey2((k) => k + 1)}><img src={MIKAGE_ICON} alt="" style={{ height: 16, width: 16, objectFit: "contain", verticalAlign: "middle", marginRight: 5, filter: "invert(1) opacity(0.5)" }} />リセット</button>
+            <button className="btn-secondary" onClick={() => setTreeKey2((k) => k + 1)}>リセット</button>
           </div>
           <Plot
             key={treeKey2}
