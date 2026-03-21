@@ -147,7 +147,7 @@ export default function SongsTab({ records }: Props) {
           margin: { l: 160, r: 55, t: 16, b: 10 },
           height: Math.max(380, top20.length * 26),
         }}
-        config={{ displayModeBar: false, responsive: true }}
+        config={{ displayModeBar: false, responsive: true, scrollZoom: false }}
         style={{ width: '100%' }}
         useResizeHandler
       />
@@ -184,7 +184,7 @@ export default function SongsTab({ records }: Props) {
               margin: { l: 40, r: 20, t: 24, b: 60 },
               height: 320,
             }}
-            config={{ displayModeBar: false, responsive: true }}
+            config={{ displayModeBar: false, responsive: true, scrollZoom: false }}
             style={{ width: '100%' }}
             useResizeHandler
           />
@@ -210,7 +210,7 @@ export default function SongsTab({ records }: Props) {
               marker: { colors: artists.map(([, v]) => v), colorscale: treeColorscale, line: { width: 2, color: '#ffffff' }, pad: { t: 22, l: 4, r: 4, b: 4 } },
             }]}
             layout={{ paper_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Noto Sans JP', color: '#c0c0c0' }, margin: { t: 4, l: 0, r: 0, b: 0 }, height: 420 }}
-            config={{ displayModeBar: false, responsive: true }}
+            config={{ displayModeBar: false, responsive: true, scrollZoom: false }}
             style={{ width: '100%' }}
             useResizeHandler
           />
