@@ -73,8 +73,8 @@ body {
 }
 .tab-btn:hover { color: #a0a0a0; }
 .tab-btn.active {
-  color: #6b9fd4;
-  border-bottom-color: #6b9fd4;
+  color: #b32e46;
+  border-bottom-color: #b32e46;
 }
 
 .tab-icon {
@@ -111,7 +111,7 @@ body {
 }
 .btn-secondary:hover {
   background: #242424;
-  color: #6b9fd4;
+  color: #b32e46;
   border-color: #3e3e3e;
 }
 
@@ -180,8 +180,8 @@ body {
 .setlist-table td:nth-child(4) { width: 60px; }
 .setlist-table tr:last-child td { border-bottom: none; }
 .setlist-table tr:hover td { background: #1a1a1a; }
-.setlist-table a { color: #6b9fd4; text-decoration: none; }
-.setlist-table a:hover { color: #9bbde0; text-decoration: underline; }
+.setlist-table a { color: #b32e46; text-decoration: none; }
+.setlist-table a:hover { color: #d4667a; text-decoration: underline; }
 
 /* 楽曲一覧表：スクロール対応 */
 .songs-table-wrap {
@@ -238,8 +238,8 @@ h3 {
   margin: 0 0 10px;
 }
 
-a { color: #6b9fd4; }
-a:hover { color: #9bbde0; }
+a { color: #b32e46; }
+a:hover { color: #d4667a; }
 
 /* モバイル・デスクトップ切り替え */
 .tabs-mobile { display: none; }
@@ -253,7 +253,7 @@ a:hover { color: #9bbde0; }
   gap: 8px;
 }
 .select-arrow {
-  color: #6b9fd4;
+  color: #b32e46;
   font-size: 0.85rem;
   pointer-events: none;
   flex-shrink: 0;
@@ -269,13 +269,13 @@ a:hover { color: #9bbde0; }
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #6b9fd4;
+  color: #b32e46;
   cursor: pointer;
   outline: none;
   min-width: 200px;
 }
 .mobile-tab-select select:focus {
-  border-color: #6b9fd4;
+  border-color: #b32e46;
 }
 
 @media (max-width: 600px) {

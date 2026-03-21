@@ -22,7 +22,7 @@ BANNER_URL = (
     "https://yt3.googleusercontent.com/U6LeCOlVJ4m68-o30FpSEjVuwFxmPYYzDD3je0Sy_SuSYesAmoUvIkSyP81M2l73qOIcpNP7"
     "=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
 )
-ACCENT = "#6b9fd4"
+ACCENT = "#b32e46"
 
 # ─────────────────────────────────────────
 # GitHub ヘルパー
@@ -452,7 +452,7 @@ def page_songs(df: pd.DataFrame):
     else:
         fig_tree = px.treemap(
             treemap_df, path=["リリース年"], values="曲数", color="曲数",
-            color_continuous_scale=[[0.0,"#d0e4f4"],[0.4,"#9bbde0"],[0.7,"#6b9fd4"],[1.0,"#2e5a8a"]],
+            color_continuous_scale=[[0.0,"#f4d0d5"],[0.4,"#e07585"],[0.7,"#b32e46"],[1.0,"#6b1525"]],
         )
         fig_tree.update_traces(
             texttemplate="<b>%{label}</b><br>%{value}曲",
@@ -478,7 +478,7 @@ def page_songs(df: pd.DataFrame):
     else:
         fig_art = px.treemap(
             artist_df, path=["原曲アーティスト"], values="歌唱回数", color="歌唱回数",
-            color_continuous_scale=[[0.0,"#d0e4f4"],[0.4,"#9bbde0"],[0.7,"#6b9fd4"],[1.0,"#2e5a8a"]],
+            color_continuous_scale=[[0.0,"#f4d0d5"],[0.4,"#e07585"],[0.7,"#b32e46"],[1.0,"#6b1525"]],
         )
         fig_art.update_traces(
             texttemplate="<b>%{label}</b><br>%{value}曲",

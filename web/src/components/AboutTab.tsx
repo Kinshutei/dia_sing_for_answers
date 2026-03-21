@@ -3,9 +3,9 @@ export default function AboutTab() {
     <div style={{ maxWidth: 760, margin: '0 auto', lineHeight: 1.85, color: '#c0c0c0' }}>
 
       <section style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>このサイトについて</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>このサイトについて</h3>
         <p>
-          このサイトはRK Music所属のVSinger <strong style={{ color: '#6b9fd4' }}>Diα（ディア）</strong>さんの歌ってみた・配信情報をまとめたファンメイドのデータベースサイトです。
+          このサイトはRK Music所属のVSinger <strong style={{ color: '#b32e46' }}>Diα（ディア）</strong>さんの歌ってみた・配信情報をまとめたファンメイドのデータベースサイトです。
         </p>
         <p>
           公式サイトではありませんので、掲載情報には誤りを含む場合がございます。RK Music及びDiαさんへの直接のお問い合わせはなさらないようお願いいたします。ご質問等については、<a href="https://x.com/WL_GE_inn" target="_blank" rel="noopener noreferrer">白百合と金鷲亭(@WL_GE_inn)</a>までお問い合わせください。
@@ -16,17 +16,17 @@ export default function AboutTab() {
       </section>
 
       <section style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>本サイトの構築目的</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>本サイトの構築目的</h3>
         <p>
           本サイトは個人が運営する情報発信サイトです。Diαさんの活動をより多くの方に知っていただくこと、そしてDiαさんのモチベーション向上に少しでも貢献できればとの想いから開設しました。
         </p>
       </section>
 
       <section style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>タブの使い方</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>タブの使い方</h3>
         <div style={{ display: 'grid', gap: 12 }}>
           <div style={{ background: '#161616', border: '1px solid #222', borderRadius: 8, padding: '14px 18px' }}>
-            <div style={{ fontWeight: 700, color: '#6b9fd4', marginBottom: 6, fontSize: '0.95rem' }}>
+            <div style={{ fontWeight: 700, color: '#b32e46', marginBottom: 6, fontSize: '0.95rem' }}>
               🎙 LiveStreaming Info
             </div>
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#a0a0a0' }}>
@@ -34,7 +34,7 @@ export default function AboutTab() {
             </p>
           </div>
           <div style={{ background: '#161616', border: '1px solid #222', borderRadius: 8, padding: '14px 18px' }}>
-            <div style={{ fontWeight: 700, color: '#6b9fd4', marginBottom: 6, fontSize: '0.95rem' }}>
+            <div style={{ fontWeight: 700, color: '#b32e46', marginBottom: 6, fontSize: '0.95rem' }}>
               🎵 Uta-Mita DB
             </div>
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#a0a0a0' }}>
@@ -45,7 +45,7 @@ export default function AboutTab() {
       </section>
 
       <section style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>データについて</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>データについて</h3>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem', color: '#a0a0a0' }}>
           <tbody>
             {[
@@ -64,19 +64,19 @@ export default function AboutTab() {
       </section>
 
       <section style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>リンク</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>リンク</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a href="https://www.youtube.com/channel/UC80TduEq6Sp4n2DkiUH2eLQ" target="_blank" rel="noopener noreferrer" style={{ color: '#6b9fd4', fontSize: '0.95rem' }}>
+          <a href="https://www.youtube.com/channel/UC80TduEq6Sp4n2DkiUH2eLQ" target="_blank" rel="noopener noreferrer" style={{ color: '#b32e46', fontSize: '0.95rem' }}>
             ▶ Diα YouTube チャンネル
           </a>
-          <a href="https://x.com/fused_dia" target="_blank" rel="noopener noreferrer" style={{ color: '#6b9fd4', fontSize: '0.95rem' }}>
+          <a href="https://x.com/fused_dia" target="_blank" rel="noopener noreferrer" style={{ color: '#b32e46', fontSize: '0.95rem' }}>
             𝕏 Diα X（Twitter）
           </a>
         </div>
       </section>
 
       <section>
-        <h3 style={{ color: '#6b9fd4', fontSize: '1.1rem' }}>免責事項</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>免責事項</h3>
         <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.8 }}>
           本サイトは個人が運営するものであり、RK Music様およびDiα様とは無関係です。掲載情報の正確性は確保するよう努めておりますが、誤りを含む場合がございます。RK Music様およびDiα様より情報の削除を要請された場合は、速やかに対応いたします。
         </p>

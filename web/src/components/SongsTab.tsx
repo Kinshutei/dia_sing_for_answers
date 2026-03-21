@@ -82,10 +82,10 @@ export default function SongsTab({ records }: Props) {
   }
 
   const treeColorscale: [number, string][] = [
-    [0.0, '#111a2e'],
-    [0.4, '#1e3050'],
-    [0.7, '#2e5a8a'],
-    [1.0, '#6b9fd4'],
+    [0.0, '#1a0a0d'],
+    [0.4, '#4a1525'],
+    [0.7, '#7f2235'],
+    [1.0, '#b32e46'],
   ]
 
   return (
@@ -113,7 +113,7 @@ export default function SongsTab({ records }: Props) {
                 <td style={{ color: '#666' }}>{s.作詞}</td>
                 <td style={{ color: '#666' }}>{s.作曲}</td>
                 <td style={{ color: '#666' }}>{s.リリース日}</td>
-                <td style={{ textAlign: 'center', fontWeight: 600, color: '#6b9fd4' }}>{s.歌唱回数}</td>
+                <td style={{ textAlign: 'center', fontWeight: 600, color: '#b32e46' }}>{s.歌唱回数}</td>
               </tr>
             ))}
           </tbody>
@@ -168,7 +168,7 @@ export default function SongsTab({ records }: Props) {
               marker: {
                 color: years.map(([, v]) => v),
                 colorscale: [
-                  [0.0, '#111a2e'], [0.4, '#1e3050'], [0.7, '#2e5a8a'], [1.0, '#6b9fd4'],
+                  [0.0, '#1a0a0d'], [0.4, '#4a1525'], [0.7, '#7f2235'], [1.0, '#b32e46'],
                 ],
                 line: { width: 0 },
               },
