@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'streaminginfo_Mikage.csv'
-      - 'song_master_Mikage.csv'
+      - 'rkmusic_song_master.csv'
       - 'web/**'
   workflow_dispatch:
 
@@ -42,7 +42,7 @@ jobs:
         working-directory: web
         env:
           VITE_CSV_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/streaminginfo_Mikage.csv
-          VITE_MASTER_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/song_master_Mikage.csv
+          VITE_MASTER_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/rkmusic_song_master.csv
 
       - uses: actions/upload-pages-artifact@v3
         with:
