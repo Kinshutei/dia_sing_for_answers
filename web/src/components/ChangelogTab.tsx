@@ -1,6 +1,10 @@
 export default function ChangelogTab() {
   const entries = [
     {
+      date: '2026-04-06',
+      items: ['非公式サイト、狭間の場所を開設'],
+    },
+    {
       date: '2026-03-21',
       items: ['サイト公開'],
     },
