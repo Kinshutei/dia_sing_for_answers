@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 
 import Plot from 'react-plotly.js'
 import { StreamingRecord, SongStat } from '../types'
@@ -20,6 +20,9 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: '歌唱回数', label: '歌唱回数' },
 ]
 
+const CARD_THRESHOLD = 15
+const CARD_PAGE_SIZE = 50
+
 function sortSongs(songs: SongStat[], key: SortKey, dir: SortDir): SongStat[] {
   return [...songs].sort((a, b) => {
     const av = a[key]
@@ -38,6 +41,15 @@ export default function SongsTab({ records }: Props) {
   const songs: SongStat[] = useMemo(() => aggregateSongs(records), [records])
   const [sortKey, setSortKey] = useState<SortKey>('歌唱回数')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [openCards, setOpenCards] = useState<Set<number>>(new Set())
+  const toggleCard = useCallback((i: number) => {
+    setOpenCards(prev => {
+      const next = new Set(prev)
+      next.has(i) ? next.delete(i) : next.add(i)
+      return next
+    })
+  }, [])
+  const [cardLimit, setCardLimit] = useState(0)
   const sortedSongs = useMemo(() => sortSongs(songs, sortKey, sortDir), [songs, sortKey, sortDir])
   const top20 = songs.slice(0, 20)
   const [barKey, setBarKey] = useState(0)
@@ -45,7 +57,7 @@ export default function SongsTab({ records }: Props) {
   const [treeKey2, setTreeKey2] = useState(0)
 
   const maxCount = top20[0]?.歌唱回数 ?? 1
-  const barColors = top20.map((s) => `rgba(107,159,212,${0.2 + 0.7 * (s.歌唱回数 / maxCount)})`)
+  const barColors = top20.map((s) => `rgba(179,46,70,${0.25 + 0.75 * (s.歌唱回数 / maxCount)})`)
 
   const yearMap = new Map<string, number>()
   for (const s of songs) {
@@ -78,7 +90,7 @@ export default function SongsTab({ records }: Props) {
 
   const sortIndicator = (key: SortKey) => {
     if (sortKey !== key) return <span style={{ color: '#ccc', marginLeft: 4 }}>⇅</span>
-    return <span style={{ color: '#5a7fa8', marginLeft: 4 }}>{sortDir === 'asc' ? '▲' : '▼'}</span>
+    return <span style={{ color: '#b32e46', marginLeft: 4 }}>{sortDir === 'asc' ? '▲' : '▼'}</span>
   }
 
   const treeColorscale: [number, string][] = [
@@ -90,6 +102,46 @@ export default function SongsTab({ records }: Props) {
 
   return (
     <div>
+      {/* カード表示（スマホ） */}
+      <div className="songs-card-list">
+        {(() => {
+          const aboveThreshold = sortedSongs.filter(s => s.歌唱回数 >= CARD_THRESHOLD)
+          const belowThreshold = sortedSongs.filter(s => s.歌唱回数 < CARD_THRESHOLD)
+          const visibleSongs = aboveThreshold.concat(belowThreshold.slice(0, cardLimit))
+          const remaining = belowThreshold.length - cardLimit
+          return (
+            <>
+              {visibleSongs.map((s, i) => (
+                <div
+                  key={s.楽曲名}
+                  className={`songs-card${openCards.has(i) ? ' open' : ''}`}
+                  onClick={() => toggleCard(i)}
+                >
+                  <div className="songs-card-top">
+                    <span className="songs-card-title-row">
+                      <span className="songs-card-title">{s.楽曲名}</span>
+                      {s.原曲アーティスト && <span className="songs-card-artist">　{s.原曲アーティスト}</span>}
+                    </span>
+                    <span className="songs-card-count">{s.歌唱回数}回</span>
+                  </div>
+                  {s.リリース日 && <div className="songs-card-sub">リリース：{s.リリース日}</div>}
+                  <div className="songs-card-detail">
+                    {s.作詞 && <div className="songs-card-detail-row"><span className="songs-card-detail-label">作詞</span><span>{s.作詞}</span></div>}
+                    {s.作曲 && <div className="songs-card-detail-row"><span className="songs-card-detail-label">作曲</span><span>{s.作曲}</span></div>}
+                  </div>
+                </div>
+              ))}
+              {remaining > 0 && (
+                <button className="songs-card-more-btn" onClick={e => { e.stopPropagation(); setCardLimit(l => l + CARD_PAGE_SIZE) }}>
+                  さらに {remaining} 件表示
+                </button>
+              )}
+            </>
+          )
+        })()}
+      </div>
+
+      {/* テーブル表示（PC） */}
       <div className="songs-table-wrap">
         <table className="songs-table">
           <thead>
@@ -142,9 +194,10 @@ export default function SongsTab({ records }: Props) {
           plot_bgcolor: 'rgba(0,0,0,0)',
           font: { family: 'Noto Sans JP', color: '#a0a0a0', size: 12 },
           yaxis: { autorange: 'reversed', showgrid: false, tickfont: { size: 11 }, color: '#a0a0a0' },
-          xaxis: { showgrid: true, gridcolor: 'rgba(255,255,255,0.05)', zeroline: false, color: '#606060' },
+          xaxis: { showgrid: true, gridcolor: 'rgba(179,46,70,0.15)', zeroline: false, color: '#606060' },
           margin: { l: 160, r: 55, t: 16, b: 10 },
           height: Math.max(380, top20.length * 26),
+          dragmode: false,
         }}
         config={{ displayModeBar: false, responsive: true, scrollZoom: false }}
         style={{ width: '100%' }}
@@ -179,9 +232,10 @@ export default function SongsTab({ records }: Props) {
               plot_bgcolor: 'rgba(0,0,0,0)',
               font: { family: 'Noto Sans JP', color: '#a0a0a0', size: 12 },
               xaxis: { showgrid: false, color: '#606060', tickangle: -45, tickfont: { size: 11 } },
-              yaxis: { showgrid: true, gridcolor: 'rgba(255,255,255,0.05)', zeroline: false, color: '#606060' },
+              yaxis: { showgrid: true, gridcolor: 'rgba(179,46,70,0.15)', zeroline: false, color: '#606060' },
               margin: { l: 40, r: 20, t: 24, b: 60 },
               height: 320,
+              dragmode: false,
             }}
             config={{ displayModeBar: false, responsive: true, scrollZoom: false }}
             style={{ width: '100%' }}
@@ -208,7 +262,7 @@ export default function SongsTab({ records }: Props) {
               hovertemplate: '<b>%{label}</b><br>%{value}回 (%{text})<extra></extra>',
               marker: { colors: artists.map(([, v]) => v), colorscale: treeColorscale, line: { width: 2, color: '#ffffff' }, pad: { t: 22, l: 4, r: 4, b: 4 } },
             }]}
-            layout={{ paper_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Noto Sans JP', color: '#c0c0c0' }, margin: { t: 4, l: 0, r: 0, b: 0 }, height: 420 }}
+            layout={{ paper_bgcolor: 'rgba(0,0,0,0)', font: { family: 'Noto Sans JP', color: '#c0c0c0' }, margin: { t: 4, l: 0, r: 0, b: 0 }, height: 420, dragmode: false }}
             config={{ displayModeBar: false, responsive: true, scrollZoom: false }}
             style={{ width: '100%' }}
             useResizeHandler

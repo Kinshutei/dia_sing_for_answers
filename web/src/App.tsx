@@ -268,8 +268,8 @@ export default function App() {
           <span /><span /><span />
         </button>
 
-        {/* ── ヒーローセクション（TOP / About で表示） ── */}
-        {(activeTab === null || activeTab === 'about') && (
+        {/* ── ヒーローセクション（TOP / About / Streams で表示） ── */}
+        {(activeTab === null || activeTab === 'about' || activeTab === 'streams') && (
           <section className="hero-section">
             <video ref={videoARef} className="hero-video" src={VIDEOS[0].src} autoPlay muted playsInline />
             <video ref={videoBRef} className="hero-video" muted playsInline />
@@ -300,18 +300,27 @@ export default function App() {
                 </div>
               </div>
             )}
+            {activeTab === 'streams' && (
+              <div className="hero-streams">
+                <button className="hero-about-close" onClick={handleLogoClick}>× CLOSE</button>
+                <div className="hero-streams-body">
+                  {loading && <p className="status-text">読み込み中...</p>}
+                  {error   && <p className="status-text status-text--error">データの取得に失敗しました: {error}</p>}
+                  {!loading && !error && <StreamsTab records={records} />}
+                </div>
+              </div>
+            )}
           </section>
         )}
 
-        {/* ── コンテンツページ（Streams / Songs / Changelog） ── */}
-        {(activeTab === 'streams' || activeTab === 'songs' || activeTab === 'changelog') && (
+        {/* ── コンテンツページ（Songs / Changelog） ── */}
+        {(activeTab === 'songs' || activeTab === 'changelog') && (
           <main className="content-area">
             <button className="back-btn" onClick={handleLogoClick}>
               ← BACK TO HOME
             </button>
             {loading && <p className="status-text">読み込み中...</p>}
             {error   && <p className="status-text status-text--error">データの取得に失敗しました: {error}</p>}
-            {activeTab === 'streams'   && !loading && !error && <StreamsTab records={records} />}
             {activeTab === 'songs'     && !loading && !error && <SongsTab   records={records} />}
             {activeTab === 'changelog' && <ChangelogTab />}
           </main>

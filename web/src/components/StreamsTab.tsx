@@ -89,8 +89,8 @@ export default function StreamsTab({ records }: Props) {
         )}
         {!isSearching && (
           <>
-            <button className="btn-secondary" onClick={() => { setDefaultOpen(true); setMountKey((k) => k + 1) }}>▼ 全て開く</button>
-            <button className="btn-secondary" onClick={() => { setDefaultOpen(false); setMountKey((k) => k + 1) }}>▲ 全て閉じる</button>
+            <button className="btn-secondary" onClick={() => { setDefaultOpen(true); setMountKey((k) => k + 1) }}>▼ OPEN</button>
+            <button className="btn-secondary" onClick={() => { setDefaultOpen(false); setMountKey((k) => k + 1) }}>▼ CLOSE</button>
           </>
         )}
       </div>
