@@ -49,7 +49,7 @@ export default function SongsTab({ records }: Props) {
       return next
     })
   }, [])
-  const [cardLimit, setCardLimit] = useState(0)
+  const [cardLimit, setCardLimit] = useState(CARD_PAGE_SIZE)
   const sortedSongs = useMemo(() => sortSongs(songs, sortKey, sortDir), [songs, sortKey, sortDir])
   const top20 = songs.slice(0, 20)
   const [barKey, setBarKey] = useState(0)
