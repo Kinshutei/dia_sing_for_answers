@@ -23,22 +23,22 @@ export default function AboutTab() {
       </section>
 
       <section style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>タブの使い方</h3>
+        <h3 style={{ color: '#b32e46', fontSize: '1.1rem' }}>メニューの使い方</h3>
         <div style={{ display: 'grid', gap: 12 }}>
           <div style={{ background: '#161616', border: '1px solid #222', borderRadius: 8, padding: '14px 18px' }}>
             <div style={{ fontWeight: 700, color: '#b32e46', marginBottom: 6, fontSize: '0.95rem' }}>
-              🎙 LiveStreaming Info
+              🎙 LiveStreaming INFO
             </div>
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#a0a0a0' }}>
-              歌枠・配信ごとのセットリスト一覧です。配信日・枠名でグループ化され、各枠をクリックすると歌唱曲リストが展開します。YouTube リンクから該当配信へ直接移動でき、楽曲名の右側のリンクからはその歌が始まるあたりへ飛べます！
+              歌枠・配信ごとのセットリスト一覧です。楽曲名・アーティスト名での絞り込み検索ができます。配信日・枠名でグループ化され、各枠をクリックするとセットリストが展開します。YouTube リンクから該当配信へ直接移動でき、楽曲名の右側のリンクからはその歌が始まるあたりへ飛べます！
             </p>
           </div>
           <div style={{ background: '#161616', border: '1px solid #222', borderRadius: 8, padding: '14px 18px' }}>
             <div style={{ fontWeight: 700, color: '#b32e46', marginBottom: 6, fontSize: '0.95rem' }}>
-              🎵 Uta-Mita DB
+              🎵 Sung Repertoire
             </div>
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#a0a0a0' }}>
-              楽曲ごとの集計データです。列ヘッダーをクリックするとその列でソートできます。下部のグラフで歌唱回数ランキング・リリース年度分布・原曲アーティスト分布を確認できます。
+              楽曲ごとの集計データです。楽曲名・原曲アーティスト・作詞・作曲・リリース日・歌唱回数の各列ヘッダーをクリックするとソートできます。下部のグラフで歌唱回数ランキング・リリース年度分布・原曲アーティスト分布を確認できます。
             </p>
           </div>
         </div>
