@@ -1,18 +1,12 @@
-import Papa from 'papaparse'
 import { StreamingRecord, SongMaster, SongStat } from '../types'
 
 // ─────────────────────────────────────────
 // 楽曲マスター
 // ─────────────────────────────────────────
-export function parseSongMaster(text: string): Map<string, SongMaster> {
-  const cleaned = text.replace(/^﻿/, '')
-  const result = Papa.parse<Record<string, string>>(cleaned, {
-    header: true,
-    skipEmptyLines: true,
-  })
+export function parseSongMaster(rows: Record<string, string>[]): Map<string, SongMaster> {
   const map = new Map<string, SongMaster>()
-  for (const row of result.data) {
-    const id = (row['song_id'] ?? row['﻿song_id'])?.trim()
+  for (const row of rows) {
+    const id = row['song_id']?.trim()
     if (!id) continue
     map.set(id, {
       song_id: id,
@@ -27,18 +21,13 @@ export function parseSongMaster(text: string): Map<string, SongMaster> {
 }
 
 // ─────────────────────────────────────────
-// 配信情報 CSV（新形式: song_id参照 / 旧形式: 楽曲名直書き 両対応）
+// 配信情報（新形式: song_id参照 / 旧形式: 楽曲名直書き 両対応）
 // ─────────────────────────────────────────
 export function parseCSV(
-  text: string,
+  rows: Record<string, string>[],
   masterMap: Map<string, SongMaster> = new Map()
 ): StreamingRecord[] {
-  const result = Papa.parse<Record<string, string>>(text, {
-    header: true,
-    skipEmptyLines: true,
-  })
-
-  return result.data.map((row) => {
+  return rows.map((row) => {
     const songId = row['song_id']?.trim() ?? ''
     const master = masterMap.get(songId)
 

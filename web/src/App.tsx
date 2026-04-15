@@ -10,11 +10,11 @@ import './App.css'
 
 const STREAMING_CSV_URL =
   import.meta.env.VITE_CSV_URL ??
-  'https://raw.githubusercontent.com/Kinshutei/dia_sing_for_answers/main/streaminginfo_Dia.csv'
+  'https://raw.githubusercontent.com/Kinshutei/dia_sing_for_answers/main/streaminginfo_Dia.json'
 
 const SONG_MASTER_URL =
   import.meta.env.VITE_MASTER_URL ??
-  'https://raw.githubusercontent.com/Kinshutei/dia_sing_for_answers/main/rkmusic_song_master.csv'
+  'https://raw.githubusercontent.com/Kinshutei/dia_sing_for_answers/main/rkmusic_song_master.json'
 
 const VIDEOS = [
   { src: `${import.meta.env.BASE_URL}dia_moviecard_01.mp4`, grayscale: false, rate: 0.6  },
@@ -112,11 +112,11 @@ export default function App() {
         ])
         if (!masterRes.ok) throw new Error(`song_master HTTP ${masterRes.status}`)
         if (!streamRes.ok) throw new Error(`streaming_info HTTP ${streamRes.status}`)
-        const [masterText, streamText] = await Promise.all([
-          masterRes.text(),
-          streamRes.text(),
+        const [masterData, streamData] = await Promise.all([
+          masterRes.json(),
+          streamRes.json(),
         ])
-        setRecords(parseCSV(streamText, parseSongMaster(masterText)))
+        setRecords(parseCSV(streamData, parseSongMaster(masterData)))
       } catch (e: unknown) {
         setError(String(e))
       } finally {
