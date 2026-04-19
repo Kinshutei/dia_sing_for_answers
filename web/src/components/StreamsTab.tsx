@@ -195,7 +195,7 @@ function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, set
               )}
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto' }} className="setlist-table-wrap">
               <table className="setlist-table">
                 <thead>
                   <tr>
@@ -212,24 +212,22 @@ function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, set
                     const hitTitle  = query.length > 0 && r.楽曲名.toLowerCase().includes(q)
                     const hitArtist = query.length > 0 && r.原曲Artist.toLowerCase().includes(q)
                     const isHit = hitTitle || hitArtist
+                    const fa = firstAppearance.get(r.楽曲名)
+                    const isFirst = fa?.枠名 === r.枠名 && fa?.歌唱順 === r.歌唱順
                     return (
                       <tr key={i} style={isHit ? { backgroundColor: 'rgba(107,159,212,0.12)' } : undefined}>
                         <td>{r.歌唱順}</td>
                         <td style={hitTitle ? { fontWeight: 600, color: '#b32e46' } : undefined}>
-                          {(() => {
-                            const fa = firstAppearance.get(r.楽曲名)
-                            const isFirst = fa?.枠名 === r.枠名 && fa?.歌唱順 === r.歌唱順
-                            return isFirst ? (
-                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                                <span style={{
-                                  fontSize: 10, fontWeight: 700, color: '#d4a843',
-                                  border: '1px solid #d4a843', borderRadius: 3,
-                                  padding: '1px 4px', letterSpacing: '0.05em', lineHeight: 1.4,
-                                }}>初</span>
-                                {r.楽曲名}
-                              </span>
-                            ) : r.楽曲名
-                          })()}
+                          {isFirst ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, color: '#d4a843',
+                                border: '1px solid #d4a843', borderRadius: 3,
+                                padding: '1px 4px', letterSpacing: '0.05em', lineHeight: 1.4,
+                              }}>初</span>
+                              {r.楽曲名}
+                            </span>
+                          ) : r.楽曲名}
                         </td>
                         <td style={{ color: hitArtist ? '#b32e46' : '#888888', fontWeight: hitArtist ? 600 : undefined }}>{r.原曲Artist}</td>
                         <td>
@@ -247,6 +245,43 @@ function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, set
                   })}
                 </tbody>
               </table>
+            </div>
+
+            <div className="setlist-card-list">
+              {setlist.map((r, i) => {
+                const q = query.toLowerCase()
+                const hitTitle  = query.length > 0 && r.楽曲名.toLowerCase().includes(q)
+                const hitArtist = query.length > 0 && r.原曲Artist.toLowerCase().includes(q)
+                const isHit = hitTitle || hitArtist
+                const fa = firstAppearance.get(r.楽曲名)
+                const isFirst = fa?.枠名 === r.枠名 && fa?.歌唱順 === r.歌唱順
+                return (
+                  <div key={i} className={`setlist-card${isHit ? ' setlist-card--hit' : ''}`}>
+                    <div className="setlist-card-row1">
+                      <span className="setlist-card-no">{r.歌唱順}</span>
+                      <span className="setlist-card-title" style={hitTitle ? { color: '#b32e46', fontWeight: 600 } : undefined}>
+                        {isFirst && (
+                          <span className="setlist-card-first-badge">初</span>
+                        )}
+                        {r.楽曲名}
+                        {r.原曲Artist && (
+                          <span className="setlist-card-artist" style={hitArtist ? { color: '#b32e46', fontWeight: 600 } : undefined}>
+                            {' '}/ {r.原曲Artist}
+                          </span>
+                        )}
+                      </span>
+                      {r.枠URL && (
+                        <a href={r.枠URL} target="_blank" rel="noopener noreferrer" className="setlist-card-link">▶</a>
+                      )}
+                    </div>
+                    <div className="setlist-card-row2">
+                      {r.作詞 && <span><span className="setlist-card-meta-label">作詞</span>{r.作詞}</span>}
+                      {r.作曲 && <span><span className="setlist-card-meta-label">作曲</span>{r.作曲}</span>}
+                      {r.リリース日 && <span><span className="setlist-card-meta-label">リリース</span>{r.リリース日}</span>}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>

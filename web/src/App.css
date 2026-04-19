@@ -577,6 +577,84 @@ body {
 .setlist-table a { color: #b32e46; text-decoration: none; }
 .setlist-table a:hover { color: #d4667a; text-decoration: underline; }
 
+.setlist-card-list { display: none; }
+
+@media (max-width: 768px) {
+  .setlist-table-wrap { display: none; }
+  .setlist-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 0;
+  }
+  .setlist-card {
+    background: rgba(107, 159, 212, 0.05);
+    border: 1px solid #1e2a38;
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .setlist-card--hit {
+    background: rgba(107, 159, 212, 0.12);
+    border-color: #3a5a7a;
+  }
+  .setlist-card-row1 {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .setlist-card-no {
+    flex-shrink: 0;
+    color: #484848;
+    font-size: 11px;
+    min-width: 18px;
+  }
+  .setlist-card-title {
+    flex: 1;
+    color: #e0e0e0;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .setlist-card-first-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #d4a843;
+    border: 1px solid #d4a843;
+    border-radius: 3px;
+    padding: 1px 4px;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .setlist-card-artist {
+    font-size: 12px;
+    color: #888;
+    font-weight: 400;
+  }
+  .setlist-card-link {
+    flex-shrink: 0;
+    color: #5a7fa8;
+    font-size: 14px;
+    text-decoration: none;
+    padding-left: 4px;
+  }
+  .setlist-card-row2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #666;
+  }
+  .setlist-card-meta-label {
+    color: #484848;
+    margin-right: 3px;
+  }
+}
+
 
 /* ══════════════════════════════════════════
    楽曲一覧表
