@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { StreamingRecord } from '../types'
 import { extractYtVideoId } from '../utils/csv'
 
@@ -149,6 +149,24 @@ interface ExpanderProps {
 function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, setlist, query, showCollab, firstAppearance }: ExpanderProps) {
   const [localOpen, setLocalOpen] = useState(defaultOpen)
   const isOpen = forceOpen || localOpen
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState<string>(defaultOpen ? 'auto' : '0')
+
+  useEffect(() => {
+    if (!bodyRef.current) return
+    if (isOpen) {
+      const h = bodyRef.current.scrollHeight
+      setHeight(`${h}px`)
+      const timer = setTimeout(() => setHeight('auto'), 350)
+      return () => clearTimeout(timer)
+    } else {
+      // auto → px → 0 の順で縮める（transitionのため）
+      setHeight(`${bodyRef.current.scrollHeight}px`)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setHeight('0'))
+      })
+    }
+  }, [isOpen])
 
   return (
     <div className="expander">
@@ -161,7 +179,7 @@ function StreamExpander({ label, forceOpen, defaultOpen, thumbUrl, cleanUrl, set
         <span dangerouslySetInnerHTML={{ __html: label }} />
       </button>
 
-      <div style={{ maxHeight: isOpen ? '1000px' : '0', overflow: 'hidden', transition: 'max-height 0.35s ease' }}>
+      <div ref={bodyRef} style={{ height, overflow: 'hidden', transition: height === 'auto' ? 'none' : 'height 0.35s ease' }}>
         <div className="expander-body">
           <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '16px' }}>
             <div>
