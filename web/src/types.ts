@@ -22,12 +22,6 @@ export interface StreamingRecord {
   リリース日: string
 }
 
-export interface StreamInfo {
-  枠名: string
-  配信日: string
-  枠URL: string
-}
-
 export interface SongStat {
   楽曲名: string
   原曲アーティスト: string
